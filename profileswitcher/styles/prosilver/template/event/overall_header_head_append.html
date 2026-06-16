@@ -1,0 +1,37 @@
+<!-- IF S_PSS_LEFT -->
+<style>:root{--pss-online:"{PSS_ONLINE_TEXT}";}</style>
+<!-- ENDIF -->
+<script type="text/javascript">
+// <![CDATA[
+	function switchProfiles() {
+		var pss_cont = $('#page-body');
+		var pss_btn = $('#profile-switcher');
+		var pss_url = pss_btn.attr('href');
+		var pss_left = pss_cont.hasClass('leftsided');
+
+		phpbb.addAjaxCallback('pss', function(res) {
+			if (res.success) {
+				if(pss_left) {
+					pss_cont.removeClass('leftsided');
+					pss_btn.parent('li').attr('class', 'small-icon icon-pss-left');
+					pss_btn.html('{L_PSS_LEFT}');
+					pss_url = pss_url.substring(0, pss_url.length - 1) + '1';
+				} else {
+					pss_cont.addClass('leftsided');
+					pss_btn.parent('li').attr('class', 'small-icon icon-pss-right');
+					pss_btn.html('{L_PSS_RIGHT}');
+					pss_url = pss_url.substring(0, pss_url.length - 1) + '0';
+				}
+				pss_btn.attr('href', pss_url);
+			}
+		});
+	}
+// ]]>
+</script>
+
+<!-- INCLUDECSS @ecyaz_profileSwitcher/profile_side_switcher.css -->
+<!-- IF T_PSS_STYLESHEET_LANG_LINK -->
+<!-- INCLUDECSS @ecyaz_profileSwitcher/{T_PSS_STYLESHEET_LANG_LINK} -->
+<!-- ELSEIF T_PSS_STYLESHEET_FALLBACK -->
+<!-- INCLUDECSS {T_PSS_STYLESHEET_FALLBACK} -->
+<!-- ENDIF -->

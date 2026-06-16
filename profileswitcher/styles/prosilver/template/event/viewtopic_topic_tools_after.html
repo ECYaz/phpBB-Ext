@@ -1,0 +1,11 @@
+<!-- IF S_USER_LOGGED_IN and not S_IS_BOT -->
+	<!-- IF S_PSS_LEFT -->
+		<li class="small-icon icon-pss-right">
+			<a href="{PSS_URL_RIGHT}" id="profile-switcher" onclick="switchProfiles(); return false;" data-ajax="pss">{L_PSS_RIGHT}</a>
+		</li>
+	<!-- ELSE -->
+		<li class="small-icon icon-pss-left">
+			<a href="{PSS_URL_LEFT}" id="profile-switcher" onclick="switchProfiles(); return false;" data-ajax="pss">{L_PSS_LEFT}</a>
+		</li>
+	<!-- ENDIF -->
+<!-- ENDIF -->

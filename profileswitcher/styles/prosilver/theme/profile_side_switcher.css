@@ -1,0 +1,75 @@
+/* Mini profiles on the left */
+.leftsided .post:not(.profile_hidden) div.postbody {
+	float: right;
+	width: 79%;
+}
+.leftsided .postprofile {
+	float: left;
+	width: 20%;
+	border-left: none;
+	border-right: 1px solid #FFF;
+}
+.leftsided .pm .postprofile {
+	border-left: none;
+	border-right: 1px solid #DDD;
+}
+.leftsided .postprofile dd, .leftsided .postprofile dt {
+	margin-left: 0;
+	margin-right: 12px;
+}
+.leftsided .post.online {
+	background-image: none;
+}
+@media only screen and (max-width: 700px), only screen and (max-device-width: 700px) {
+	.leftsided .post:not(.profile_hidden) div.postbody {
+		float: none;
+		width: auto;
+	}
+	.leftsided .postprofile {
+		float: none;
+		width: auto;
+		border-right: none;
+	}
+	.leftsided .pm .postprofile {
+		border-right: none;
+	}
+	.leftsided .postprofile dd, .leftsided .postprofile dt {
+		margin: 0;
+	}
+}
+
+.icon-pss-left {
+	background-image: url("./images/icon_profiles_left.png");
+}
+
+.icon-pss-right {
+	background-image: url("./images/icon_profiles_right.png");
+}
+
+/* Mirrored top-left ribbon — only active when admin sets pss_ribbon_left=1.
+   Both .pss-ribbon-left and .leftsided are added to the same #page-body element
+   by the template JS, so we use a compound class selector (no space between them).
+   Specificity: 2 classes + 1 element > per-lang GIF rule (1 class + 1 element). */
+.pss-ribbon-left.leftsided .postprofile {
+	text-align: right;
+}
+.pss-ribbon-left.leftsided .online .postprofile {
+	background: none;
+	position: relative;
+	overflow: hidden;
+}
+.pss-ribbon-left.leftsided .online .postprofile::before {
+	content: var(--pss-online, "ONLINE");
+	position: absolute;
+	top: 13px;
+	left: -25px;
+	width: 90px;
+	transform: rotate(-45deg);
+	background-color: #CADCEB;
+	color: #12A3EB;
+	font: bold 10px/1.4 Arial, Helvetica, sans-serif;
+	letter-spacing: 1px;
+	text-align: center;
+	text-transform: uppercase;
+	z-index: 3;
+}

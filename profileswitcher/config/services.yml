@@ -1,0 +1,14 @@
+services:
+    ecyaz.profileSwitcher.listener:
+        class: ecyaz\profileSwitcher\event\listener
+        arguments:
+            - '@template'
+            - '@user'
+            - '@dbal.conn'
+            - '@request'
+            - '@config'
+            - '@language'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+        tags:
+            - { name: event.listener }
