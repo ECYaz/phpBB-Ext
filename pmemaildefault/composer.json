@@ -1,0 +1,28 @@
+{
+    "name": "ecyaz/pmemaildefault",
+    "type": "phpbb-extension",
+    "description": "Turns on email notifications for incoming private messages by default, for new and existing users.",
+    "homepage": "https://github.com/ECYaz/phpBB-Extensions",
+    "version": "1.0.0",
+    "license": "GPL-2.0-only",
+    "keywords": ["phpbb", "extension", "notifications", "private-messages", "email"],
+    "authors": [
+        {
+            "name": "ECYaz",
+            "homepage": "https://github.com/ECYaz",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.2"
+    },
+    "require-dev": {
+        "phpbb/epv": "dev-master"
+    },
+    "extra": {
+        "display-name": "PM Email Default",
+        "soft-require": {
+            "phpbb/phpbb": ">=3.3.0,<4.0.0@dev"
+        }
+    }
+}

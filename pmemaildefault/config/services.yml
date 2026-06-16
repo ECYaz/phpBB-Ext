@@ -1,0 +1,5 @@
+services:
+    ecyaz.pmemaildefault.listener:
+        class: ecyaz\pmemaildefault\event\main_listener
+        tags:
+            - { name: event.listener }
