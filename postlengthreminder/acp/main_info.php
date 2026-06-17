@@ -19,7 +19,7 @@ class main_info
 			'title'		=> 'ACP_POSTLENGTHREMINDER_TITLE',
 			'modes'		=> [
 				'settings'	=> [
-					'title'	=> 'ACP_POSTLENGTHREMINDER_TITLE',
+					'title'	=> 'ACP_POSTLENGTHREMINDER_SETTINGS',
 					'auth'	=> 'ext_ecyaz/postlengthreminder && acl_a_board',
 					'cat'	=> ['ACP_CAT_DOT_MODS'],
 				],

@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Warns users before submitting a post that is shorter than a configurable length.",
     "homepage": "https://github.com/ECYaz/phpBB-Extensions",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "license": "GPL-2.0-only",
     "authors": [
         { "name": "ECYaz" }
