@@ -1,0 +1,4 @@
+ecyaz_liveupdates_poll:
+    path: /liveupdates/poll
+    defaults: { _controller: ecyaz.liveupdates.controller.poll:handle }
+    methods: [GET]

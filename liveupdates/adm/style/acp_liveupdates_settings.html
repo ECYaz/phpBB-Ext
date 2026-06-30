@@ -1,0 +1,90 @@
+<!-- INCLUDE overall_header.html -->
+
+<a id="maincontent"></a>
+
+<h1>{{ lang('ACP_LIVEUPDATES_SETTINGS') }}</h1>
+
+<p>{{ lang('LIVEUPDATES_SETTINGS_EXPLAIN') }}</p>
+
+<form id="lu_settings" method="post" action="{{ U_ACTION }}">
+
+<fieldset>
+	<legend>{{ lang('LIVEUPDATES_GENERAL') }}</legend>
+
+	<dl>
+		<dt><label for="lu_enabled">{{ lang('LIVEUPDATES_ENABLED') }}</label></dt>
+		<dd><label><input type="radio" class="radio" name="lu_enabled" value="1"<!-- IF LU_ENABLED --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+			<label><input type="radio" class="radio" name="lu_enabled" value="0"<!-- IF not LU_ENABLED --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
+	</dl>
+
+	<dl>
+		<dt><label for="lu_posture">{{ lang('LIVEUPDATES_POSTURE') }}</label><br><span>{{ lang('LIVEUPDATES_POSTURE_EXPLAIN') }}</span></dt>
+		<dd><select id="lu_posture" name="lu_posture">
+			<!-- BEGIN lu_postures -->
+			<option value="{{ lu_postures.VALUE }}"<!-- IF lu_postures.SELECTED --> selected<!-- ENDIF -->>{{ lu_postures.NAME }}</option>
+			<!-- END lu_postures -->
+		</select></dd>
+	</dl>
+
+	<dl>
+		<dt><label for="lu_interval_override">{{ lang('LIVEUPDATES_INTERVAL_OVERRIDE') }}</label><br><span>{{ lang('LIVEUPDATES_INTERVAL_OVERRIDE_EXPLAIN') }}</span></dt>
+		<dd><input id="lu_interval_override" type="number" min="0" name="lu_interval_override" value="{{ LU_INTERVAL_OVERRIDE }}"> {{ lang('LIVEUPDATES_SECONDS') }}</dd>
+	</dl>
+
+	<dl>
+		<dt><label for="lu_min_interval">{{ lang('LIVEUPDATES_MIN_INTERVAL') }}</label><br><span>{{ lang('LIVEUPDATES_MIN_INTERVAL_EXPLAIN') }}</span></dt>
+		<dd><input id="lu_min_interval" type="number" min="1" name="lu_min_interval" value="{{ LU_MIN_INTERVAL }}"> {{ lang('LIVEUPDATES_SECONDS') }}</dd>
+	</dl>
+</fieldset>
+
+<fieldset>
+	<legend>{{ lang('LIVEUPDATES_GUESTS') }}</legend>
+	<dl>
+		<dt><label for="lu_guest_enabled">{{ lang('LIVEUPDATES_GUEST_ENABLED') }}</label></dt>
+		<dd><label><input type="radio" class="radio" name="lu_guest_enabled" value="1"<!-- IF LU_GUEST_ENABLED --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+			<label><input type="radio" class="radio" name="lu_guest_enabled" value="0"<!-- IF not LU_GUEST_ENABLED --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
+	</dl>
+	<dl>
+		<dt><label for="lu_guest_interval">{{ lang('LIVEUPDATES_GUEST_INTERVAL') }}</label></dt>
+		<dd><input id="lu_guest_interval" type="number" min="1" name="lu_guest_interval" value="{{ LU_GUEST_INTERVAL }}"> {{ lang('LIVEUPDATES_SECONDS') }}</dd>
+	</dl>
+</fieldset>
+
+<fieldset>
+	<legend>{{ lang('LIVEUPDATES_SURFACES') }}</legend>
+	<dl>
+		<dt><label for="lu_surface_topic">{{ lang('LIVEUPDATES_SURFACE_TOPIC') }}</label></dt>
+		<dd><input id="lu_surface_topic" type="checkbox" class="checkbox" name="lu_surface_topic" value="1"<!-- IF LU_SURFACE_TOPIC --> checked<!-- ENDIF -->></dd>
+	</dl>
+	<dl>
+		<dt><label for="lu_surface_notify">{{ lang('LIVEUPDATES_SURFACE_NOTIFY') }}</label></dt>
+		<dd><input id="lu_surface_notify" type="checkbox" class="checkbox" name="lu_surface_notify" value="1"<!-- IF LU_SURFACE_NOTIFY --> checked<!-- ENDIF -->></dd>
+	</dl>
+	<dl>
+		<dt><label for="lu_surface_index">{{ lang('LIVEUPDATES_SURFACE_INDEX') }}</label></dt>
+		<dd><input id="lu_surface_index" type="checkbox" class="checkbox" name="lu_surface_index" value="1"<!-- IF LU_SURFACE_INDEX --> checked<!-- ENDIF -->></dd>
+	</dl>
+	<dl>
+		<dt><label for="lu_surface_pm">{{ lang('LIVEUPDATES_SURFACE_PM') }}</label></dt>
+		<dd><input id="lu_surface_pm" type="checkbox" class="checkbox" name="lu_surface_pm" value="1"<!-- IF LU_SURFACE_PM --> checked<!-- ENDIF -->></dd>
+	</dl>
+	<dl>
+		<dt><label for="lu_surface_online">{{ lang('LIVEUPDATES_SURFACE_ONLINE') }}</label></dt>
+		<dd><input id="lu_surface_online" type="checkbox" class="checkbox" name="lu_surface_online" value="1"<!-- IF LU_SURFACE_ONLINE --> checked<!-- ENDIF -->></dd>
+	</dl>
+	<dl>
+		<dt><label for="lu_surface_stats">{{ lang('LIVEUPDATES_SURFACE_STATS') }}</label></dt>
+		<dd><input id="lu_surface_stats" type="checkbox" class="checkbox" name="lu_surface_stats" value="1"<!-- IF LU_SURFACE_STATS --> checked<!-- ENDIF -->></dd>
+	</dl>
+</fieldset>
+
+<fieldset class="submit-buttons">
+	<legend>{{ lang('SUBMIT') }}</legend>
+	<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}">
+	<input class="button2" type="reset" value="{{ lang('RESET') }}">
+	{{ S_FORM_TOKEN }}
+</fieldset>
+
+</form>
+
+<!-- INCLUDE overall_footer.html -->

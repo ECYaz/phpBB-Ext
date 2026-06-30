@@ -1,0 +1,14 @@
+.lu-banner {
+	display: block;
+	margin: 6px 0;
+	padding: 8px 12px;
+	border-radius: 4px;
+	background: #1f6fb2;
+	color: #fff;
+	cursor: pointer;
+	text-align: center;
+	font-weight: bold;
+}
+.lu-banner[hidden] { display: none; }
+.lu-row-new { animation: lu-flash 2s ease-out 1; }
+@keyframes lu-flash { from { background: #fff7cc; } to { background: transparent; } }

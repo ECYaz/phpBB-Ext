@@ -1,0 +1,28 @@
+services:
+    ecyaz.liveupdates.settings:
+        class: ecyaz\liveupdates\settings
+        arguments:
+            - '@config'
+
+    ecyaz.liveupdates.controller.poll:
+        class: ecyaz\liveupdates\controller\poll
+        arguments:
+            - '@ecyaz.liveupdates.settings'
+            - '@dbal.conn'
+            - '@auth'
+            - '@user'
+            - '@request'
+            - '@notification_manager'
+            - '@cache'
+            - '@config'
+
+    ecyaz.liveupdates.listener:
+        class: ecyaz\liveupdates\event\main_listener
+        arguments:
+            - '@ecyaz.liveupdates.settings'
+            - '@template'
+            - '@user'
+            - '@controller.helper'
+            - '@language'
+        tags:
+            - { name: event.listener }
