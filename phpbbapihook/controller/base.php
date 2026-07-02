@@ -149,4 +149,61 @@ abstract class base
 
 		return (int) $this->request->variable($name, $default);
 	}
+
+	/**
+	 * Resolve the display name for a post row.
+	 *
+	 * Anonymous posts use the stored guest name (post_username). For a
+	 * registered poster we use the LEFT-JOINed username; if that is null/empty
+	 * (the account was hard-deleted) we fall back to any stored post_username.
+	 *
+	 * @param array $row Row with poster_id, username, post_username.
+	 * @return string
+	 */
+	protected function resolve_poster(array $row)
+	{
+		$username      = isset($row['username']) ? (string) $row['username'] : '';
+		$post_username = isset($row['post_username']) ? (string) $row['post_username'] : '';
+
+		if ((int) $row['poster_id'] === ANONYMOUS)
+		{
+			return ($post_username !== '') ? $post_username : $username;
+		}
+
+		if ($username !== '')
+		{
+			return $username;
+		}
+
+		// Hard-deleted registered poster: fall back to any stored guest name.
+		return $post_username;
+	}
+
+	/**
+	 * Parse limit/offset query parameters with clamping.
+	 *
+	 * @param int $default_limit Default number of rows per page.
+	 * @param int $max_limit     Hard upper bound for limit.
+	 * @return array{limit:int,offset:int}
+	 */
+	protected function paginate_args($default_limit = 25, $max_limit = 100)
+	{
+		$limit  = (int) $this->request->variable('limit', $default_limit);
+		$offset = (int) $this->request->variable('offset', 0);
+
+		if ($limit < 1)
+		{
+			$limit = $default_limit;
+		}
+		if ($limit > $max_limit)
+		{
+			$limit = $max_limit;
+		}
+		if ($offset < 0)
+		{
+			$offset = 0;
+		}
+
+		return ['limit' => $limit, 'offset' => $offset];
+	}
 }

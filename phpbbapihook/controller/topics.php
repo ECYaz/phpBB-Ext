@@ -32,6 +32,9 @@ class topics extends base
 	/** @var \phpbb\content_visibility */
 	protected $content_visibility;
 
+	/** @var \ecyaz\phpbbapihook\api\content_renderer */
+	protected $content_renderer;
+
 	/** @var string */
 	protected $root_path;
 
@@ -48,6 +51,7 @@ class topics extends base
 		\phpbb\config\config $config,
 		\phpbb\db\driver\driver_interface $db,
 		\phpbb\content_visibility $content_visibility,
+		\ecyaz\phpbbapihook\api\content_renderer $content_renderer,
 		$root_path,
 		$php_ext
 	)
@@ -58,6 +62,7 @@ class topics extends base
 		$this->config             = $config;
 		$this->db                 = $db;
 		$this->content_visibility = $content_visibility;
+		$this->content_renderer   = $content_renderer;
 		$this->root_path          = $root_path;
 		$this->php_ext            = $php_ext;
 	}
@@ -222,6 +227,85 @@ class topics extends base
 	}
 
 	/**
+	 * GET /api/topics/{topic_id}/posts — list posts in a topic.
+	 */
+	public function get_posts($topic_id)
+	{
+		return $this->run('topic.posts', function (\ecyaz\phpbbapihook\api\auth_context $ctx) use ($topic_id) {
+			$topic_id = (int) $topic_id;
+
+			$topic = $this->fetch_topic($topic_id);
+			if ($topic === null)
+			{
+				throw new exception('topic_not_found', 404);
+			}
+			$forum_id = (int) $topic['forum_id'];
+			$this->assert_topic_visible($topic, $forum_id);
+
+			if (!$ctx->can_access_forum($forum_id))
+			{
+				throw new exception('forum_not_allowed', 403);
+			}
+			if (!$this->auth->acl_get('f_read', $forum_id))
+			{
+				throw new exception('insufficient_permissions', 403);
+			}
+			if ((string) $topic['forum_password'] !== '')
+			{
+				throw new exception('forum_password_required', 403);
+			}
+
+			$pg = $this->paginate_args();
+
+			$sql = 'SELECT COUNT(p.post_id) AS total FROM ' . POSTS_TABLE . ' p
+				WHERE p.topic_id = ' . (int) $topic_id . '
+					AND ' . $this->content_visibility->get_visibility_sql('post', $forum_id, 'p.');
+			$res = $this->db->sql_query($sql);
+			$total = (int) $this->db->sql_fetchfield('total');
+			$this->db->sql_freeresult($res);
+
+			$sql = 'SELECT p.post_id, p.poster_id, p.post_time, p.post_subject, p.post_text,
+					p.bbcode_uid, p.bbcode_bitfield, p.post_edit_count, p.post_edit_time, p.post_username, u.username
+				FROM ' . POSTS_TABLE . ' p
+				LEFT JOIN ' . USERS_TABLE . ' u ON u.user_id = p.poster_id
+				WHERE p.topic_id = ' . (int) $topic_id . '
+					AND ' . $this->content_visibility->get_visibility_sql('post', $forum_id, 'p.') . '
+				ORDER BY p.post_time ASC, p.post_id ASC';
+			$res = $this->db->sql_query_limit($sql, $pg['limit'], $pg['offset']);
+
+			$posts = [];
+			while ($row = $this->db->sql_fetchrow($res))
+			{
+				$rendered = $this->content_renderer->render($row);
+				$poster = $this->resolve_poster($row);
+				$posts[] = [
+					'post_id'        => (int) $row['post_id'],
+					'poster_id'      => (int) $row['poster_id'],
+					'poster'         => $poster,
+					'post_time'      => (int) $row['post_time'],
+					'edit_count'     => (int) $row['post_edit_count'],
+					'edit_time'      => (int) $row['post_edit_time'],
+					'subject'        => (string) $row['post_subject'],
+					'content_html'   => $rendered['content_html'],
+					'content_bbcode' => $rendered['content_bbcode'],
+				];
+			}
+			$this->db->sql_freeresult($res);
+
+			return $this->responder->success([
+				'topic'      => [
+					'topic_id' => $topic_id,
+					'forum_id' => $forum_id,
+					'title'    => (string) $topic['topic_title'],
+					'locked'   => ((int) $topic['topic_status'] === ITEM_LOCKED),
+				],
+				'pagination' => ['limit' => $pg['limit'], 'offset' => $pg['offset'], 'total' => $total, 'count' => count($posts)],
+				'posts'      => $posts,
+			]);
+		});
+	}
+
+	/**
 	 * Map an API topic-type string to a phpBB POST_* constant, enforcing the
 	 * matching forum permission.
 	 */
@@ -367,6 +451,7 @@ class topics extends base
 			'enable_smilies'      => true,
 			'enable_urls'         => true,
 			'enable_indexing'     => true,
+			// phpBB duplicate-post detection field; not security-sensitive
 			'message_md5'         => md5($message_parser->message),
 			'post_checksum'       => '',
 			'post_edit_reason'    => '',

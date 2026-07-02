@@ -3,6 +3,51 @@
 All notable changes to **phpbbAPIhook** are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] — 2026-07-02
+
+New read endpoints. No schema or config changes; existing boards receive the
+endpoints on update. Fully backward-compatible.
+
+### Added
+- `GET /api/forums/{id}/topics` — list topics in a forum, sorted by most-recent
+  activity. Respects `content_visibility`, the credential's forum allow-list, and
+  the linked user's `f_read` permission. Supports `limit`/`offset` pagination
+  (default 25, cap 100). Board-wide global announcements (`topic_type = POST_GLOBAL`,
+  `forum_id = 0`) are automatically included in every forum's topic listing, matching
+  phpBB's viewforum UI. Results are ordered by type (globals/announcements/stickies
+  first), then by most-recent activity.
+- `GET /api/topics/{id}/posts` — list posts in a topic in chronological order.
+  Each post carries rendered `content_html` (HTML) and `content_bbcode`
+  (raw BBCode) from the new `content_renderer` service. Pagination as above.
+- `GET /api/posts/{id}` — read a single post. Returns the post object, its
+  parent topic summary, and its forum. Uses `content_renderer` for both rendered
+  forms.
+- `GET /api/search` — full-text search. Accepts `q` (keywords), `type`
+  (`posts` or `topics`; default `posts`), optional `forum_id` filter, optional
+  `author` prefix filter, and pagination. Only searches forums the linked user
+  can read and the credential is allowed to access.
+- `content_renderer` service: renders a stored post row into `content_html` and
+  `content_bbcode`; shared by topics, posts, and search controllers.
+- New error codes: `forum_not_found` (404), `post_not_found` (404),
+  `search_unavailable` (503), `search_query_too_short` (400).
+
+### Security
+- All read endpoints enforce password-protected forums: `GET /api/forums/{id}/topics`,
+  `/topics/{id}/posts`, and `/posts/{id}` return `forum_password_required` (403), and
+  `/search` excludes password-protected forums from results. The API never exposes content
+  from a forum the linked account has not unlocked — consistent with the existing write
+  paths and `GET /api/topics/{id}`.
+- Search results are strictly scoped to forums the linked user can both read (`f_read`)
+  and search (`f_search`) and that the credential's allow-list permits; newly created or
+  otherwise unlisted forums are excluded by default (fail-closed).
+- All read endpoints apply `content_visibility`, so soft-deleted and unapproved
+  topics/posts are hidden from users without the moderator approval permission.
+
+### Fixed
+- Pagination is consistent across all list endpoints: an out-of-range `offset` returns an
+  empty page rather than the last page, and results carry a stable ordering tiebreaker to
+  prevent duplicate/skipped rows across page boundaries.
+
 ## [1.0.1] — 2026-06-22
 
 Security hardening from a full audit. No API or schema changes.

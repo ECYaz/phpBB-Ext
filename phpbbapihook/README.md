@@ -111,11 +111,14 @@ Every error response uses the same shape:
 | 403         | `ip_not_allowed`           | Caller's IP is not on the credential's allow-list.   |
 | 403         | `https_required`           | Board requires HTTPS; request was HTTP.              |
 | 400         | `missing_fields`           | Required body field(s) absent.                       |
-| 404         | `topic_not_found`          | Topic does not exist.                                |
+| 404         | `topic_not_found`          | Topic does not exist or is not visible to the linked user. |
 | 404         | `forum_not_found`          | Forum does not exist.                                |
+| 404         | `post_not_found`           | Post does not exist or is not visible to the linked user. |
 | 429         | `rate_limit_exceeded`      | Credential has exceeded its rate limit.              |
 | 429         | `flood_control`            | phpBB flood-control interval not yet elapsed.        |
+| 400         | `search_query_too_short`   | Query is too short or contains no indexable terms.   |
 | 503         | `api_disabled`             | Master API switch is off in ACP.                     |
+| 503         | `search_unavailable`       | Full-text search is disabled on the board, or the search backend failed to initialise. |
 
 ---
 
@@ -277,6 +280,246 @@ curl https://example.com/phpBB/app.php/api/me/permissions \
 ```
 
 (`allowed_forums` is an empty array when the credential is allowed all forums.)
+
+---
+
+### GET /api/forums/{forum_id}/topics
+
+List topics in a forum, ordered by most-recent activity (newest last-post first).
+
+**Path parameter:** `forum_id` — integer ID of the forum.
+
+**Query parameters:**
+
+| Parameter | Type | Default | Description                          |
+|-----------|------|---------|--------------------------------------|
+| `limit`   | int  | 25      | Number of topics to return (max 100).|
+| `offset`  | int  | 0       | Number of topics to skip.            |
+
+**Example:**
+
+```bash
+curl "https://example.com/phpBB/app.php/api/forums/2/topics?limit=10&offset=0" \
+  -H "X-API-Key: pbapi_abc123..."
+```
+
+**Success (200):**
+
+```json
+{
+  "success": true,
+  "forum": {
+    "forum_id": 2,
+    "name": "Your first forum"
+  },
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "total": 42,
+    "count": 10
+  },
+  "topics": [
+    {
+      "topic_id": 7,
+      "forum_id": 2,
+      "title": "Latest discussion",
+      "type": "normal",
+      "poster_id": 5,
+      "poster": "Alice",
+      "replies": 3,
+      "views": 100,
+      "first_post_time": 1750000000,
+      "last_post_time": 1750100000,
+      "last_poster_id": 6,
+      "last_poster": "Bob",
+      "locked": false
+    }
+  ]
+}
+```
+
+`type` is one of `normal`, `sticky`, `announcement`, or `global`.
+
+---
+
+### GET /api/topics/{topic_id}/posts
+
+List posts in a topic in chronological order (oldest first). Each post includes
+both its rendered HTML and its raw BBCode.
+
+**Path parameter:** `topic_id` — integer ID of the topic.
+
+**Query parameters:**
+
+| Parameter | Type | Default | Description                        |
+|-----------|------|---------|------------------------------------|
+| `limit`   | int  | 25      | Number of posts to return (max 100).|
+| `offset`  | int  | 0       | Number of posts to skip.           |
+
+**Example:**
+
+```bash
+curl "https://example.com/phpBB/app.php/api/topics/42/posts?limit=25&offset=0" \
+  -H "X-API-Key: pbapi_abc123..."
+```
+
+**Success (200):**
+
+```json
+{
+  "success": true,
+  "topic": {
+    "topic_id": 42,
+    "forum_id": 2,
+    "title": "Hello from the API",
+    "locked": false
+  },
+  "pagination": {
+    "limit": 25,
+    "offset": 0,
+    "total": 3,
+    "count": 3
+  },
+  "posts": [
+    {
+      "post_id": 101,
+      "poster_id": 5,
+      "poster": "Alice",
+      "post_time": 1750000000,
+      "edit_count": 0,
+      "edit_time": 0,
+      "subject": "Hello from the API",
+      "content_html": "<p>This is the post body.</p>",
+      "content_bbcode": "This is the post body."
+    }
+  ]
+}
+```
+
+---
+
+### GET /api/posts/{post_id}
+
+Read a single post by ID. Returns the post, its parent topic summary, and its
+forum.
+
+**Path parameter:** `post_id` — integer ID of the post.
+
+**Example:**
+
+```bash
+curl https://example.com/phpBB/app.php/api/posts/101 \
+  -H "X-API-Key: pbapi_abc123..."
+```
+
+**Success (200):**
+
+```json
+{
+  "success": true,
+  "post": {
+    "post_id": 101,
+    "poster_id": 5,
+    "poster": "Alice",
+    "post_time": 1750000000,
+    "edit_count": 0,
+    "edit_time": 0,
+    "subject": "Hello from the API",
+    "content_html": "<p>This is the post body.</p>",
+    "content_bbcode": "This is the post body."
+  },
+  "topic": {
+    "topic_id": 42,
+    "forum_id": 2,
+    "title": "Hello from the API",
+    "locked": false
+  },
+  "forum": {
+    "forum_id": 2,
+    "name": "Your first forum"
+  }
+}
+```
+
+---
+
+### GET /api/search
+
+Full-text post and topic search using the board's configured search backend.
+Only forums the linked user can read and the credential is allowed to access are
+searched.
+
+**Query parameters:**
+
+| Parameter  | Type   | Required | Default | Description                                              |
+|------------|--------|----------|---------|----------------------------------------------------------|
+| `q`        | string | Yes      | —       | Keywords to search for.                                  |
+| `type`     | string | No       | `posts` | Result type: `posts` or `topics`.                        |
+| `forum_id` | int    | No       | 0       | Restrict results to a single forum (0 = all accessible). |
+| `author`   | string | No       | —       | Filter by username prefix (case-insensitive).            |
+| `limit`    | int    | No       | 25      | Number of results to return (max 100).                   |
+| `offset`   | int    | No       | 0       | Number of results to skip.                               |
+
+**Example (post search):**
+
+```bash
+curl "https://example.com/phpBB/app.php/api/search?q=hello+world&type=posts&limit=10" \
+  -H "X-API-Key: pbapi_abc123..."
+```
+
+**Success (200) — `type: "posts"`:**
+
+```json
+{
+  "success": true,
+  "type": "posts",
+  "query": "hello world",
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "total": 5,
+    "count": 5
+  },
+  "results": [
+    {
+      "post_id": 101,
+      "topic_id": 42,
+      "forum_id": 2,
+      "poster": "Alice",
+      "post_time": 1750000000,
+      "snippet": "This is the post body."
+    }
+  ]
+}
+```
+
+**Success (200) — `type: "topics"`:**
+
+```json
+{
+  "success": true,
+  "type": "topics",
+  "query": "hello world",
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "total": 2,
+    "count": 2
+  },
+  "results": [
+    {
+      "topic_id": 42,
+      "forum_id": 2,
+      "title": "Hello from the API",
+      "poster": "Alice",
+      "last_post_time": 1750100000
+    }
+  ]
+}
+```
+
+`snippet` (post results only) is a plain-text excerpt of up to 200 characters
+stripped of BBCode tags.
 
 ---
 

@@ -15,12 +15,35 @@ ecyaz_phpbbapihook_topic_read:
     requirements: { topic_id: '\d+' }
     defaults: { _controller: ecyaz.phpbbapihook.controller.topics:get_topic }
 
+ecyaz_phpbbapihook_topic_posts:
+    path: /api/topics/{topic_id}/posts
+    methods: [GET]
+    requirements: { topic_id: '\d+' }
+    defaults: { _controller: ecyaz.phpbbapihook.controller.topics:get_posts }
+
 ecyaz_phpbbapihook_forum_list:
     path: /api/forums
     methods: [GET]
     defaults: { _controller: ecyaz.phpbbapihook.controller.forums:list_forums }
 
+ecyaz_phpbbapihook_forum_topics:
+    path: /api/forums/{forum_id}/topics
+    methods: [GET]
+    requirements: { forum_id: '\d+' }
+    defaults: { _controller: ecyaz.phpbbapihook.controller.forums:list_topics }
+
+ecyaz_phpbbapihook_post_read:
+    path: /api/posts/{post_id}
+    methods: [GET]
+    requirements: { post_id: '\d+' }
+    defaults: { _controller: ecyaz.phpbbapihook.controller.posts:get_post }
+
 ecyaz_phpbbapihook_me_permissions:
     path: /api/me/permissions
     methods: [GET]
     defaults: { _controller: ecyaz.phpbbapihook.controller.meta:my_permissions }
+
+ecyaz_phpbbapihook_search:
+    path: /api/search
+    methods: [GET]
+    defaults: { _controller: ecyaz.phpbbapihook.controller.search:search }

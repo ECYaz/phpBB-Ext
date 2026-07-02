@@ -26,6 +26,12 @@ services:
             - '@ecyaz.phpbbapihook.logger'
             - '%core.table_prefix%users'
 
+    ecyaz.phpbbapihook.content_renderer:
+        class: ecyaz\phpbbapihook\api\content_renderer
+        arguments:
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
     ecyaz.phpbbapihook.controller.topics:
         class: ecyaz\phpbbapihook\controller\topics
         arguments:
@@ -38,6 +44,7 @@ services:
             - '@config'
             - '@dbal.conn'
             - '@content.visibility'
+            - '@ecyaz.phpbbapihook.content_renderer'
             - '%core.root_path%'
             - '%core.php_ext%'
 
@@ -51,6 +58,20 @@ services:
             - '@user'
             - '@auth'
             - '@dbal.conn'
+            - '@content.visibility'
+
+    ecyaz.phpbbapihook.controller.posts:
+        class: ecyaz\phpbbapihook\controller\posts
+        arguments:
+            - '@ecyaz.phpbbapihook.authenticator'
+            - '@ecyaz.phpbbapihook.responder'
+            - '@ecyaz.phpbbapihook.logger'
+            - '@request'
+            - '@user'
+            - '@auth'
+            - '@dbal.conn'
+            - '@content.visibility'
+            - '@ecyaz.phpbbapihook.content_renderer'
 
     ecyaz.phpbbapihook.controller.meta:
         class: ecyaz\phpbbapihook\controller\meta
@@ -61,3 +82,20 @@ services:
             - '@request'
             - '@user'
             - '@auth'
+
+    ecyaz.phpbbapihook.controller.search:
+        class: ecyaz\phpbbapihook\controller\search
+        arguments:
+            - '@ecyaz.phpbbapihook.authenticator'
+            - '@ecyaz.phpbbapihook.responder'
+            - '@ecyaz.phpbbapihook.logger'
+            - '@request'
+            - '@user'
+            - '@auth'
+            - '@config'
+            - '@dbal.conn'
+            - '@content.visibility'
+            - '@ecyaz.phpbbapihook.content_renderer'
+            - '@dispatcher'
+            - '%core.root_path%'
+            - '%core.php_ext%'
