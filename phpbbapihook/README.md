@@ -30,11 +30,10 @@ A secure, permission-controlled REST API extension for phpBB 3.3.x. It lets exte
 
 ## Installation
 
-1. Download or clone the extension.
-2. Unzip / copy the `phpbbapihook` folder into `ext/ecyaz/` so the path becomes:
-   ```
-   phpBB/ext/ecyaz/phpbbapihook/
-   ```
+1. Download [`phpbbapihook.zip`](https://github.com/ECYaz/phpBB-Ext/raw/main/phpbbapihook.zip).
+2. Unzip it into your board's `ext/` directory so the files end up at
+   `ext/ecyaz/phpbbapihook/`. (The archive already contains the
+   `ecyaz/phpbbapihook/` folder structure, so you can extract it straight into `ext/`.)
 3. In the phpBB Administration Control Panel go to **Customise → Extension Manager**.
 4. Find **phpbbAPIhook** and click **Enable**.
 5. The extension runs its migration automatically, creating the credentials table and seeding default config.
