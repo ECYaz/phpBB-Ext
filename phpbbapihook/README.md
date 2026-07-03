@@ -8,6 +8,11 @@ A secure, permission-controlled REST API extension for phpBB 3.3.x. It lets exte
 
 - **API key authentication** — `Authorization: Bearer` or `X-API-Key` header.
 - **Per-credential user binding** — each key acts as a specific phpBB user; all phpBB permission checks apply.
+- **Create content** — create topics and post replies through phpBB's own `submit_post()`.
+- **Read content** — list a forum's topics (including global announcements), read a topic's posts, and fetch a single post; post bodies are returned as both rendered HTML and clean BBCode.
+- **Search** — keyword search over posts or topics, with optional forum and author filters.
+- **Pagination** — `limit`/`offset` on every list and search endpoint (default 25, max 100).
+- **Visibility-aware reads** — respects `content_visibility` (soft-deleted/unapproved content stays hidden) and never exposes password-protected forums.
 - **Forum allow-list** — optionally restrict a credential to specific forum IDs.
 - **IP allow-list** — optionally restrict a credential to specific client IPs.
 - **Rate limiting** — configurable requests-per-window cap per credential.
