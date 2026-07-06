@@ -69,13 +69,6 @@ Go to **ACP → Extensions → Treasure Hunt → Settings**.
 
 ---
 
-## Third-party
-
-*(List any bundled vendor assets here with name, URL, and license — e.g. item images.)*
-If none bundled beyond the seed images authored by ECYaz, this section may be omitted.
-
----
-
 ## License
 
 GNU General Public License, version 2 (GPL-2.0-only). See `license.txt`.
