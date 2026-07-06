@@ -1,0 +1,20 @@
+{
+    "name": "ecyaz/treasurehunt",
+    "type": "phpbb-extension",
+    "description": "Gamified collect-a-thon for phpBB: treasures spawn as members browse, rewarding finds with points, leaderboard rankings, and badges. No core changes.",
+    "homepage": "https://github.com/ECYaz/phpBB-Extensions",
+    "version": "0.1.0",
+    "license": "GPL-2.0-only",
+    "authors": [
+        { "name": "ECYaz", "email": "elie@theofficeweb.com" }
+    ],
+    "require": {
+        "php": ">=7.2"
+    },
+    "extra": {
+        "display-name": "Treasure Hunt",
+        "soft-require": {
+            "phpbb/phpbb": ">=3.3.0,<4.0.0@dev"
+        }
+    }
+}

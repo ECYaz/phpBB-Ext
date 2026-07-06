@@ -1,0 +1,122 @@
+<!-- INCLUDE overall_header.html -->
+
+<a id="maincontent"></a>
+<h1>{L_ACP_TH_BADGES}</h1>
+<p>{L_ACP_TH_BADGES_EXPLAIN}</p>
+
+<!-- IF ACTION_FORM -->
+
+	<!-- BEGIN errors -->
+	<p class="error">{errors.MESSAGE}</p>
+	<!-- END errors -->
+
+	<form id="acp_th_badges_form" method="post" action="{U_ACTION}">
+		<input type="hidden" name="action" value="<!-- IF EDIT_BADGE_ID -->edit<!-- ELSE -->add<!-- ENDIF -->" />
+		<!-- IF EDIT_BADGE_ID --><input type="hidden" name="badge_id" value="{EDIT_BADGE_ID}" /><!-- ENDIF -->
+
+		<fieldset>
+			<legend><!-- IF EDIT_BADGE_ID -->{L_ACP_TH_BADGE_EDIT}<!-- ELSE -->{L_ACP_TH_BADGE_ADD}<!-- ENDIF --></legend>
+
+			<dl>
+				<dt><label for="badge_name">{L_ACP_TH_BADGE_NAME}</label><br /><span>{L_ACP_TH_BADGE_NAME_EXPLAIN}</span></dt>
+				<dd><input id="badge_name" type="text" name="badge_name" value="{BADGE_NAME}" maxlength="255" size="50" /></dd>
+			</dl>
+
+			<dl>
+				<dt><label for="badge_image">{L_ACP_TH_BADGE_IMAGE}</label><br /><span>{L_ACP_TH_BADGE_IMAGE_EXPLAIN}</span></dt>
+				<dd><input id="badge_image" type="text" name="badge_image" value="{BADGE_IMAGE}" maxlength="255" size="60" /></dd>
+			</dl>
+
+			<dl>
+				<dt><label for="condition_type">{L_ACP_TH_CONDITION_TYPE}</label><br /><span>{L_ACP_TH_CONDITION_TYPE_EXPLAIN}</span></dt>
+				<dd>
+					<select id="condition_type" name="condition_type" onchange="thToggleCondValue(this.value)">
+						<option value="points"<!-- IF COND_TYPE_POINTS --> selected="selected"<!-- ENDIF -->>{L_ACP_TH_COND_POINTS}</option>
+						<option value="feat"<!-- IF not COND_TYPE_POINTS --> selected="selected"<!-- ENDIF -->>{L_ACP_TH_COND_FEAT}</option>
+					</select>
+				</dd>
+			</dl>
+
+			<dl id="row_points"<!-- IF not COND_TYPE_POINTS --> style="display:none"<!-- ENDIF -->>
+				<dt><label for="condition_value_points">{L_ACP_TH_POINTS_THRESHOLD_LABEL}</label><br /><span>{L_ACP_TH_POINTS_THRESHOLD_EXPLAIN}</span></dt>
+				<dd><input id="condition_value_points" type="number" name="condition_value_points" value="{COND_VALUE_POINTS}" min="0" size="10" /></dd>
+			</dl>
+
+			<dl id="row_feat"<!-- IF COND_TYPE_POINTS --> style="display:none"<!-- ENDIF -->>
+				<dt><label for="condition_value_feat">{L_ACP_TH_FEAT_LABEL}</label><br /><span>{L_ACP_TH_FEAT_EXPLAIN}</span></dt>
+				<dd>
+					<select id="condition_value_feat" name="condition_value_feat">
+						<!-- BEGIN feat_options -->
+						<option value="{feat_options.VALUE}"<!-- IF feat_options.SELECTED --> selected="selected"<!-- ENDIF -->>{feat_options.LABEL}</option>
+						<!-- END feat_options -->
+					</select>
+				</dd>
+			</dl>
+
+			<dl>
+				<dt><label>{L_ACP_TH_BADGE_ENABLED}</label><br /><span>{L_ACP_TH_BADGE_ENABLED_EXPLAIN}</span></dt>
+				<dd>
+					<label><input type="radio" class="radio" name="badge_enabled" value="1"<!-- IF BADGE_ENABLED --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+					<label><input type="radio" class="radio" name="badge_enabled" value="0"<!-- IF not BADGE_ENABLED --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+				</dd>
+			</dl>
+		</fieldset>
+
+		<fieldset class="submit-buttons">
+			<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />
+			<a href="{U_BACK}" class="button2">{L_BACK_TO_PREV}</a>
+			{S_FORM_TOKEN}
+		</fieldset>
+	</form>
+
+	<script>
+	function thToggleCondValue(v) {
+		var rp = document.getElementById('row_points');
+		var rf = document.getElementById('row_feat');
+		if (v === 'points') {
+			rp.style.display = '';
+			rf.style.display = 'none';
+		} else {
+			rp.style.display = 'none';
+			rf.style.display = '';
+		}
+	}
+	</script>
+
+<!-- ELSE -->
+
+	<p><a href="{U_ADD_BADGE}" class="button2">{L_ACP_TH_BADGE_ADD}</a></p>
+
+	<!-- IF not badges -->
+		<p>{L_ACP_TH_NO_BADGES}</p>
+	<!-- ELSE -->
+		<table class="table1">
+			<thead>
+				<tr>
+					<th>{L_ACP_TH_BADGE_NAME}</th>
+					<th>{L_ACP_TH_BADGE_IMAGE}</th>
+					<th>{L_ACP_TH_CONDITION}</th>
+					<th>{L_ENABLED}</th>
+					<th>{L_ACTIONS}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- BEGIN badges -->
+				<tr>
+					<td>{badges.NAME}</td>
+					<td><small>{badges.IMAGE}</small></td>
+					<td>{badges.COND_LABEL}</td>
+					<td><!-- IF badges.ENABLED -->{L_YES}<!-- ELSE -->{L_NO}<!-- ENDIF --></td>
+					<td>
+						<a href="{badges.U_EDIT}">{L_EDIT}</a> &nbsp;
+						<a href="{badges.U_DELETE}">{L_DELETE}</a>
+					</td>
+				</tr>
+				<!-- END badges -->
+			</tbody>
+		</table>
+	<!-- ENDIF -->
+
+<!-- ENDIF -->
+
+<!-- INCLUDE overall_footer.html -->

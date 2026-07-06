@@ -1,0 +1,107 @@
+<!-- INCLUDE overall_header.html -->
+
+<a id="maincontent"></a>
+<h1>{L_ACP_TREASUREHUNT_ITEMS}</h1>
+<p>{L_ACP_TREASUREHUNT_ITEMS_EXPLAIN}</p>
+
+<!-- IF ACTION_FORM -->
+
+	<!-- BEGIN errors -->
+	<p class="error">{errors.MESSAGE}</p>
+	<!-- END errors -->
+
+	<form id="treasurehunt_item_form" method="post" action="{U_ACTION}">
+		<input type="hidden" name="action" value="<!-- IF EDIT_ITEM_ID -->edit<!-- ELSE -->add<!-- ENDIF -->" />
+		<!-- IF EDIT_ITEM_ID --><input type="hidden" name="item_id" value="{EDIT_ITEM_ID}" /><!-- ENDIF -->
+
+		<fieldset>
+			<legend><!-- IF EDIT_ITEM_ID -->{L_TREASUREHUNT_EDIT_ITEM}<!-- ELSE -->{L_TREASUREHUNT_ADD_ITEM}<!-- ENDIF --></legend>
+
+			<dl>
+				<dt><label for="item_name">{L_TREASUREHUNT_ITEM_NAME}</label><br /><span>{L_TREASUREHUNT_ITEM_NAME_EXPLAIN}</span></dt>
+				<dd><input id="item_name" type="text" name="item_name" value="{FORM_ITEM_NAME}" maxlength="255" size="50" /></dd>
+			</dl>
+
+			<dl>
+				<dt><label for="item_image">{L_TREASUREHUNT_ITEM_IMAGE}</label><br /><span>{L_TREASUREHUNT_ITEM_IMAGE_EXPLAIN}</span></dt>
+				<dd><input id="item_image" type="text" name="item_image" value="{FORM_ITEM_IMAGE}" maxlength="255" size="50" /></dd>
+			</dl>
+
+			<dl>
+				<dt><label for="rarity">{L_TREASUREHUNT_RARITY}</label><br /><span>{L_TREASUREHUNT_RARITY_EXPLAIN}</span></dt>
+				<dd>
+					<select id="rarity" name="rarity">
+						<!-- BEGIN rarities -->
+						<option value="{rarities.VALUE}"<!-- IF rarities.SELECTED --> selected="selected"<!-- ENDIF -->>{rarities.LABEL}</option>
+						<!-- END rarities -->
+					</select>
+				</dd>
+			</dl>
+
+			<dl>
+				<dt><label for="points">{L_TREASUREHUNT_POINTS}</label><br /><span>{L_TREASUREHUNT_POINTS_EXPLAIN}</span></dt>
+				<dd><input id="points" type="number" min="0" max="99999" name="points" value="{FORM_POINTS}" /></dd>
+			</dl>
+
+			<dl>
+				<dt><label for="drop_weight">{L_TREASUREHUNT_DROP_WEIGHT}</label><br /><span>{L_TREASUREHUNT_DROP_WEIGHT_EXPLAIN}</span></dt>
+				<dd><input id="drop_weight" type="number" min="1" max="99999" name="drop_weight" value="{FORM_DROP_WEIGHT}" /></dd>
+			</dl>
+
+			<dl>
+				<dt><label>{L_TREASUREHUNT_ITEM_ENABLED}</label><br /><span>{L_TREASUREHUNT_ITEM_ENABLED_EXPLAIN}</span></dt>
+				<dd>
+					<label><input type="radio" class="radio" name="item_enabled" value="1"<!-- IF FORM_ENABLED --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+					<label><input type="radio" class="radio" name="item_enabled" value="0"<!-- IF not FORM_ENABLED --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+				</dd>
+			</dl>
+		</fieldset>
+
+		<fieldset class="submit-buttons">
+			<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />
+			<a href="{U_BACK}" class="button2">{L_BACK_TO_PREV}</a>
+			{S_FORM_TOKEN}
+		</fieldset>
+	</form>
+
+<!-- ELSE -->
+
+	<p><a href="{U_ADD_ITEM}" class="button2">{L_TREASUREHUNT_ADD_ITEM}</a></p>
+
+	<!-- IF not items -->
+		<p>{L_TREASUREHUNT_NO_ITEMS}</p>
+	<!-- ELSE -->
+		<table class="table1">
+			<thead>
+				<tr>
+					<th>{L_TREASUREHUNT_ITEM_NAME}</th>
+					<th>{L_TREASUREHUNT_ITEM_IMAGE}</th>
+					<th>{L_TREASUREHUNT_RARITY}</th>
+					<th>{L_TREASUREHUNT_POINTS}</th>
+					<th>{L_TREASUREHUNT_DROP_WEIGHT}</th>
+					<th>{L_ENABLED}</th>
+					<th>{L_ACTIONS}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- BEGIN items -->
+				<tr>
+					<td>{items.ITEM_NAME}</td>
+					<td><small>{items.ITEM_IMAGE}</small></td>
+					<td>{items.RARITY_NAME}</td>
+					<td>{items.POINTS}</td>
+					<td>{items.DROP_WEIGHT}</td>
+					<td><!-- IF items.ITEM_ENABLED -->{L_YES}<!-- ELSE -->{L_NO}<!-- ENDIF --></td>
+					<td>
+						<a href="{items.U_EDIT}">{L_EDIT}</a> &nbsp;
+						<a href="{items.U_DELETE}">{L_DELETE}</a>
+					</td>
+				</tr>
+				<!-- END items -->
+			</tbody>
+		</table>
+	<!-- ENDIF -->
+
+<!-- ENDIF -->
+
+<!-- INCLUDE overall_footer.html -->

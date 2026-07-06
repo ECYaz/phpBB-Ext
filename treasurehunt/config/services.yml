@@ -1,0 +1,82 @@
+services:
+    ecyaz.treasurehunt.listener:
+        class: ecyaz\treasurehunt\event\main_listener
+        arguments:
+            - '@config'
+            - '@language'
+            - '@template'
+            - '@controller.helper'
+            - '@user'
+            - '@request'
+            - '@path_helper'
+            - '@ecyaz.treasurehunt.spawn_manager'
+            - '@ecyaz.treasurehunt.badge_repository'
+            - '@ecyaz.treasurehunt.stats_repository'
+        tags:
+            - { name: event.listener }
+
+    ecyaz.treasurehunt.item_repository:
+        class: ecyaz\treasurehunt\service\item_repository
+        arguments:
+            - '@dbal.conn'
+            - '%core.table_prefix%treasurehunt_items'
+
+    ecyaz.treasurehunt.spawn_manager:
+        class: ecyaz\treasurehunt\service\spawn_manager
+        arguments:
+            - '@dbal.conn'
+            - '@config'
+            - '@auth'
+            - '@ecyaz.treasurehunt.item_repository'
+            - '%core.table_prefix%treasurehunt_spawns'
+            - '%core.table_prefix%treasurehunt_user'
+
+    ecyaz.treasurehunt.badge_manager:
+        class: ecyaz\treasurehunt\manager\badge_manager
+        arguments:
+            - '@ecyaz.treasurehunt.badge_repository'
+
+    ecyaz.treasurehunt.collect_manager:
+        class: ecyaz\treasurehunt\service\collect_manager
+        arguments:
+            - '@dbal.conn'
+            - '@ecyaz.treasurehunt.badge_manager'
+            - '%core.table_prefix%treasurehunt_spawns'
+            - '%core.table_prefix%treasurehunt_finds'
+            - '%core.table_prefix%treasurehunt_user'
+            - '%core.table_prefix%treasurehunt_items'
+
+    ecyaz.treasurehunt.badge_repository:
+        class: ecyaz\treasurehunt\repository\badge_repository
+        arguments:
+            - '@dbal.conn'
+            - '%core.table_prefix%treasurehunt_badges'
+            - '%core.table_prefix%treasurehunt_user_badges'
+
+    ecyaz.treasurehunt.stats_repository:
+        class: ecyaz\treasurehunt\service\stats_repository
+        arguments:
+            - '@dbal.conn'
+            - '%core.table_prefix%'
+
+    ecyaz.treasurehunt.controller.collect:
+        class: ecyaz\treasurehunt\controller\collect
+        public: true
+        arguments:
+            - '@user'
+            - '@request'
+            - '@ecyaz.treasurehunt.collect_manager'
+
+    ecyaz.treasurehunt.controller.leaderboard:
+        class: ecyaz\treasurehunt\controller\leaderboard
+        public: true
+        arguments:
+            - '@controller.helper'
+            - '@language'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '@pagination'
+            - '@ecyaz.treasurehunt.stats_repository'
+            - '%core.root_path%'
+            - '%core.php_ext%'

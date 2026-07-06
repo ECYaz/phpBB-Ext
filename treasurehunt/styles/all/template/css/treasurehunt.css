@@ -1,0 +1,68 @@
+/* Treasure Hunt — spawn display styles
+ * @package ecyaz/treasurehunt
+ * @copyright (c) 2026 ECYaz
+ * @license GPL-2.0-only */
+.th-overlay {
+	position: fixed; inset: 0; z-index: 10000;
+	display: flex; align-items: center; justify-content: center;
+	background: rgba(0, 0, 0, .55);
+}
+.th-modal {
+	background: #fff; color: #222; border-radius: 10px; padding: 24px 28px;
+	max-width: 320px; text-align: center; box-shadow: 0 8px 40px rgba(0, 0, 0, .35);
+	border-top: 5px solid #9aa0a6;
+}
+.th-item-img { max-width: 96px; max-height: 96px; display: block; margin: 0 auto 12px; }
+.th-title { font-size: 16px; font-weight: 600; margin: 0 0 16px; }
+.th-collect-btn {
+	font: inherit; cursor: pointer; border: 0; border-radius: 6px;
+	padding: 10px 22px; background: #3889ed; color: #fff; font-weight: 600;
+}
+.th-collect-btn:hover { background: #2f78d0; }
+.th-collect-btn:disabled { opacity: .6; cursor: default; }
+
+.th-icon {
+	position: fixed; right: 24px; bottom: 24px; z-index: 10000;
+	width: 56px; height: 56px; border-radius: 50%; border: 0; cursor: pointer;
+	background: #ffd24d; box-shadow: 0 4px 16px rgba(0, 0, 0, .3);
+	display: flex; align-items: center; justify-content: center;
+	animation: th-pop .3s ease-out;
+	transition: opacity .3s;
+}
+.th-icon img { max-width: 34px; max-height: 34px; }
+@keyframes th-pop { from { transform: scale(.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.th-icon-fadeout { opacity: 0; }
+
+/* rarity accents (1 common … 5 legendary) */
+.th-rarity-1 { border-top-color: #9aa0a6; }
+.th-rarity-2 { border-top-color: #4caf50; }
+.th-rarity-3 { border-top-color: #3889ed; }
+.th-rarity-4 { border-top-color: #a44cf0; }
+.th-rarity-5 { border-top-color: #f0a020; }
+
+/* Toast container — toasts stack upward from bottom-right */
+.th-toast-container {
+	position: fixed; right: 24px; bottom: 24px; z-index: 10001;
+	display: flex; flex-direction: column-reverse; gap: 8px;
+	align-items: flex-end; pointer-events: none;
+}
+.th-toast {
+	background: #222; color: #fff; padding: 10px 16px; border-radius: 8px;
+	display: flex; align-items: center; gap: 8px; max-width: 280px;
+	opacity: 0; transform: translateY(12px); transition: opacity .3s, transform .3s;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, .3); pointer-events: auto;
+}
+.th-toast.th-toast-in { opacity: 1; transform: translateY(0); }
+.th-toast img { width: 28px; height: 28px; }
+.th-toast-points { font-weight: 700; }
+
+/* Profile progress bar */
+.th-progress-bar-wrap {
+	display: block; width: 100%; height: 8px; background: #ddd;
+	border-radius: 4px; overflow: hidden; margin-top: 4px;
+}
+.th-progress-bar {
+	display: block; height: 100%; background: #3889ed;
+	border-radius: 4px; transition: width .4s;
+	max-width: 100%;
+}

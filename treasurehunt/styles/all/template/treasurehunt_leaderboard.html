@@ -1,0 +1,156 @@
+<!-- INCLUDE overall_header.html -->
+
+<div id="treasurehunt-leaderboard" class="forabg">
+
+    <!-- Tab navigation -->
+    <ul class="linklist navlinks" id="th-tabs">
+        <li class="<!-- IF VIEW == 'top' -->activetab<!-- ENDIF -->">
+            <a href="{U_VIEW_TOP}">{L_TREASUREHUNT_LB_TAB_TOP}</a>
+        </li>
+        <li class="<!-- IF VIEW == 'rare' -->activetab<!-- ENDIF -->">
+            <a href="{U_VIEW_RARE}">{L_TREASUREHUNT_LB_TAB_RARE}</a>
+        </li>
+        <li class="<!-- IF VIEW == 'me' -->activetab<!-- ENDIF -->">
+            <a href="{U_VIEW_ME}">{L_TREASUREHUNT_LB_TAB_ME}</a>
+        </li>
+    </ul>
+
+    <!-- ===== TOP COLLECTORS VIEW ===== -->
+    <!-- IF VIEW == 'top' -->
+    <div id="th-top-view">
+        <table class="table1">
+            <thead>
+                <tr>
+                    <th>{L_TREASUREHUNT_LB_RANK}</th>
+                    <th colspan="2">{L_TREASUREHUNT_LB_PLAYER}</th>
+                    <th>{L_TREASUREHUNT_LB_POINTS}</th>
+                    <th>{L_TREASUREHUNT_LB_FINDS}</th>
+                    <th>{L_TREASUREHUNT_LB_UNIQUE}</th>
+                    <th>{L_TREASUREHUNT_LB_TOP_BADGE}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN top_rows -->
+                <tr class="<!-- IF top_rows.S_ROW_ODD -->row1<!-- ELSE -->row2<!-- ENDIF -->">
+                    <td class="th-rank">#{top_rows.RANK}</td>
+                    <td class="th-avatar">{top_rows.AVATAR}</td>
+                    <td class="th-username">
+                        <!-- IF top_rows.USER_COLOUR -->
+                        <span style="color: #{top_rows.USER_COLOUR}; font-weight: bold;">{top_rows.USERNAME}</span>
+                        <!-- ELSE -->
+                        <strong>{top_rows.USERNAME}</strong>
+                        <!-- ENDIF -->
+                    </td>
+                    <td class="th-points">{top_rows.POINTS}</td>
+                    <td class="th-finds">{top_rows.TOTAL_FINDS}</td>
+                    <td class="th-unique">{top_rows.UNIQUE_ITEMS}</td>
+                    <td class="th-badge">
+                        <!-- IF top_rows.TOP_BADGE_NAME -->
+                        <img src="{top_rows.TOP_BADGE_IMG}" alt="{top_rows.TOP_BADGE_NAME}" title="{top_rows.TOP_BADGE_NAME}" class="th-badge-img" />
+                        <!-- ELSE -->
+                        &mdash;
+                        <!-- ENDIF -->
+                    </td>
+                </tr>
+                <!-- BEGINELSE -->
+                <tr>
+                    <td colspan="7">{L_TREASUREHUNT_LB_NO_PLAYERS}</td>
+                </tr>
+                <!-- END top_rows -->
+            </tbody>
+        </table>
+
+        <!-- Pagination (output by \phpbb\pagination::generate_template_pagination) -->
+        <!-- IF pagination is defined and TOTAL_PLAYERS > 20 -->
+        <div class="pagination">
+            {pagination}
+        </div>
+        <!-- ENDIF -->
+    </div>
+    <!-- ENDIF -->
+
+    <!-- ===== RAREST FINDS VIEW ===== -->
+    <!-- IF VIEW == 'rare' -->
+    <div id="th-rare-view">
+        <table class="table1">
+            <thead>
+                <tr>
+                    <th>{L_TREASUREHUNT_LB_ITEM}</th>
+                    <th>{L_TREASUREHUNT_LB_RARITY}</th>
+                    <th>{L_TREASUREHUNT_LB_POINTS}</th>
+                    <th>{L_TREASUREHUNT_LB_PLAYER}</th>
+                    <th>{L_TREASUREHUNT_LB_FOUND_AT}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN rare_rows -->
+                <tr class="<!-- IF rare_rows.S_ROW_ODD -->row1<!-- ELSE -->row2<!-- ENDIF -->">
+                    <td class="th-item">
+                        <!-- IF rare_rows.ITEM_IMAGE -->
+                        <img src="{rare_rows.ITEM_IMAGE}" alt="{rare_rows.ITEM_NAME}" class="th-item-img" />
+                        <!-- ENDIF -->
+                        {rare_rows.ITEM_NAME}
+                    </td>
+                    <td class="th-rarity th-rarity-{rare_rows.RARITY}">{rare_rows.RARITY_LABEL}</td>
+                    <td class="th-points">{rare_rows.POINTS}</td>
+                    <td class="th-username">
+                        <!-- IF rare_rows.USER_COLOUR -->
+                        <span style="color: #{rare_rows.USER_COLOUR};">{rare_rows.USERNAME}</span>
+                        <!-- ELSE -->
+                        {rare_rows.USERNAME}
+                        <!-- ENDIF -->
+                    </td>
+                    <td class="th-date">{rare_rows.FOUND_AT}</td>
+                </tr>
+                <!-- BEGINELSE -->
+                <tr>
+                    <td colspan="5">{L_TREASUREHUNT_LB_NO_RARE_FINDS}</td>
+                </tr>
+                <!-- END rare_rows -->
+            </tbody>
+        </table>
+    </div>
+    <!-- ENDIF -->
+
+    <!-- ===== YOUR STATS VIEW ===== -->
+    <!-- IF VIEW == 'me' -->
+    <div id="th-me-stats">
+        <!-- IF ME_NO_DATA -->
+        <p class="th-notice">{L_TREASUREHUNT_LB_ME_NO_DATA}</p>
+        <!-- ELSE -->
+        <table class="table1 th-me-table">
+            <tbody>
+                <tr>
+                    <th>{L_TREASUREHUNT_LB_RANK}</th>
+                    <td><strong>#{ME_RANK}</strong></td>
+                </tr>
+                <tr>
+                    <th>{L_TREASUREHUNT_LB_POINTS}</th>
+                    <td>{ME_POINTS}</td>
+                </tr>
+                <tr>
+                    <th>{L_TREASUREHUNT_LB_FINDS}</th>
+                    <td>{ME_TOTAL_FINDS}</td>
+                </tr>
+                <tr>
+                    <th>{L_TREASUREHUNT_LB_UNIQUE}</th>
+                    <td>{ME_UNIQUE_ITEMS} / {ME_ITEMS_TOTAL}</td>
+                </tr>
+                <tr>
+                    <th>{L_TREASUREHUNT_LB_COLLECTION}</th>
+                    <td>
+                        <div class="th-progress-bar" title="{ME_PROGRESS}%">
+                            <div class="th-progress-fill" style="width: {ME_PROGRESS}%"></div>
+                        </div>
+                        <span class="th-progress-label">{ME_PROGRESS}%</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- ENDIF -->
+    </div>
+    <!-- ENDIF -->
+
+</div><!-- #treasurehunt-leaderboard -->
+
+<!-- INCLUDE overall_footer.html -->

@@ -1,0 +1,78 @@
+<!-- INCLUDE overall_header.html -->
+
+<a id="maincontent"></a>
+<h1>{L_ACP_TREASUREHUNT_SETTINGS}</h1>
+<p>{L_ACP_TREASUREHUNT_SETTINGS_EXPLAIN}</p>
+
+<form id="treasurehunt_settings" method="post" action="{U_ACTION}">
+
+	<fieldset>
+		<legend>{L_TREASUREHUNT_GROUP_GENERAL}</legend>
+
+		<dl>
+			<dt><label>{L_TREASUREHUNT_ENABLE}</label><br /><span>{L_TREASUREHUNT_ENABLE_EXPLAIN}</span></dt>
+			<dd>
+				<label><input type="radio" class="radio" name="treasurehunt_enable" value="1"<!-- IF TREASUREHUNT_ENABLE --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+				<label><input type="radio" class="radio" name="treasurehunt_enable" value="0"<!-- IF not TREASUREHUNT_ENABLE --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="treasurehunt_drop_rate">{L_TREASUREHUNT_DROP_RATE}</label><br /><span>{L_TREASUREHUNT_DROP_RATE_EXPLAIN}</span></dt>
+			<dd><input id="treasurehunt_drop_rate" type="number" min="0" max="1000" name="treasurehunt_drop_rate" value="{TREASUREHUNT_DROP_RATE}" /> / 1000</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="treasurehunt_cooldown">{L_TREASUREHUNT_COOLDOWN}</label><br /><span>{L_TREASUREHUNT_COOLDOWN_EXPLAIN}</span></dt>
+			<dd><input id="treasurehunt_cooldown" type="number" min="0" max="86400" name="treasurehunt_cooldown" value="{TREASUREHUNT_COOLDOWN}" /> {L_SECONDS}</dd>
+		</dl>
+	</fieldset>
+
+	<fieldset>
+		<legend>{L_TREASUREHUNT_GROUP_SPAWN}</legend>
+
+		<dl>
+			<dt><label>{L_TREASUREHUNT_SPAWN_STYLE}</label><br /><span>{L_TREASUREHUNT_SPAWN_STYLE_EXPLAIN}</span></dt>
+			<dd>
+				<select name="treasurehunt_spawn_style">
+					<!-- BEGIN spawn_styles -->
+					<option value="{spawn_styles.VALUE}"<!-- IF spawn_styles.SELECTED --> selected="selected"<!-- ENDIF -->>{spawn_styles.LABEL}</option>
+					<!-- END spawn_styles -->
+				</select>
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="treasurehunt_spawn_expiry">{L_TREASUREHUNT_SPAWN_EXPIRY}</label><br /><span>{L_TREASUREHUNT_SPAWN_EXPIRY_EXPLAIN}</span></dt>
+			<dd><input id="treasurehunt_spawn_expiry" type="number" min="10" max="3600" name="treasurehunt_spawn_expiry" value="{TREASUREHUNT_SPAWN_EXPIRY}" /> {L_SECONDS}</dd>
+		</dl>
+	</fieldset>
+
+	<fieldset>
+		<legend>{L_TREASUREHUNT_GROUP_ACCESS}</legend>
+
+		<dl>
+			<dt><label for="treasurehunt_forum_scope">{L_TREASUREHUNT_FORUM_SCOPE}</label><br /><span>{L_TREASUREHUNT_FORUM_SCOPE_EXPLAIN}</span></dt>
+			<dd><input id="treasurehunt_forum_scope" type="text" name="treasurehunt_forum_scope" value="{TREASUREHUNT_FORUM_SCOPE}" size="40" /></dd>
+		</dl>
+
+		<dl>
+			<dt><label for="treasurehunt_play_groups">{L_TREASUREHUNT_PLAY_GROUPS}</label><br /><span>{L_TREASUREHUNT_PLAY_GROUPS_EXPLAIN}</span></dt>
+			<dd><input id="treasurehunt_play_groups" type="text" name="treasurehunt_play_groups" value="{TREASUREHUNT_PLAY_GROUPS}" size="40" /></dd>
+		</dl>
+
+		<dl>
+			<dt><label for="treasurehunt_postbit_cap">{L_TREASUREHUNT_POSTBIT_CAP}</label><br /><span>{L_TREASUREHUNT_POSTBIT_CAP_EXPLAIN}</span></dt>
+			<dd><input id="treasurehunt_postbit_cap" type="number" min="0" max="20" name="treasurehunt_postbit_cap" value="{TREASUREHUNT_POSTBIT_CAP}" /></dd>
+		</dl>
+	</fieldset>
+
+	<fieldset class="submit-buttons">
+		<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />
+		<input class="button2" type="reset" value="{L_RESET}" name="reset" />
+		{S_FORM_TOKEN}
+	</fieldset>
+
+</form>
+
+<!-- INCLUDE overall_footer.html -->

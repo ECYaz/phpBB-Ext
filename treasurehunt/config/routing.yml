@@ -1,0 +1,9 @@
+ecyaz_treasurehunt_collect:
+    path: /treasurehunt/collect
+    defaults: { _controller: ecyaz.treasurehunt.controller.collect:handle }
+    methods: [POST]
+
+ecyaz_treasurehunt_leaderboard:
+    path: /treasurehunt/leaderboard/{view}
+    defaults: { _controller: ecyaz.treasurehunt.controller.leaderboard:handle, view: top }
+    methods: [GET]

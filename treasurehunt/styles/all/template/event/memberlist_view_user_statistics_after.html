@@ -1,0 +1,24 @@
+<!-- IF S_TREASUREHUNT_PROFILE -->
+<dt class="th-profile-label">{L_TREASUREHUNT_PROFILE_HEADING}</dt>
+<dd class="th-profile-block">
+	<div class="th-profile-stats">
+		<span class="th-points">{L_TREASUREHUNT_POINTS}: <strong>{TREASUREHUNT_PROFILE_POINTS}</strong></span>
+		<span class="th-rank">{L_TREASUREHUNT_RANK}: <strong>#{TREASUREHUNT_PROFILE_RANK}</strong></span>
+		<span class="th-progress">{L_TREASUREHUNT_COLLECTION_PROGRESS}: {TREASUREHUNT_PROGRESS_FOUND} / {TREASUREHUNT_PROGRESS_TOTAL}</span>
+		<span class="th-progress-bar-wrap" role="progressbar" aria-valuenow="{TREASUREHUNT_PROGRESS_PERCENT}" aria-valuemin="0" aria-valuemax="100">
+			<span class="th-progress-bar" style="width:{TREASUREHUNT_PROGRESS_PERCENT}%"></span>
+		</span>
+	</div>
+	<!-- IF th_profile_badges -->
+	<div class="th-profile-badges">
+		<span class="th-badges-label">{L_TREASUREHUNT_BADGES_EARNED}:</span>
+		<!-- BEGIN th_profile_badges -->
+		<img src="{th_profile_badges.IMAGE}"
+			 alt="{th_profile_badges.NAME}"
+			 title="{th_profile_badges.NAME}"
+			 class="th-badge-icon" />
+		<!-- END th_profile_badges -->
+	</div>
+	<!-- ENDIF -->
+</dd>
+<!-- ENDIF -->
