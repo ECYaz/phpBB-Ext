@@ -1,0 +1,51 @@
+<!-- INCLUDECSS @ecyaz_eventscalendar/eventscalendar.css -->
+<!-- INCLUDE overall_header.html -->
+
+<div id="ecal-day" class="panel">
+	<div class="inner">
+		<h2>{DAY_LABEL}</h2>
+
+		<div class="ecal-toolbar">
+			<div class="ecal-nav">
+				<a class="button2" href="{U_PREV}">&laquo; {L_ECAL_PREV}</a>
+				<a class="button2" href="{U_MONTH}">{L_ECAL_BACK_TO_MONTH}</a>
+				<a class="button2" href="{U_NEXT}">{L_ECAL_NEXT} &raquo;</a>
+			</div>
+			<!-- IF S_CAN_POST -->
+			<div class="ecal-view-switch">
+				<a class="button1" href="{U_EVENT_ADD}">{L_ECAL_ADD_EVENT}</a>
+			</div>
+			<!-- ENDIF -->
+		</div>
+
+		<!-- IF .birthdays -->
+		<div class="ecal-day-birthdays">
+			<h3>{L_ECAL_BIRTHDAYS}</h3>
+			<ul>
+				<!-- BEGIN birthdays -->
+				<li>&#127874; {birthdays.USERNAME}</li>
+				<!-- END birthdays -->
+			</ul>
+		</div>
+		<!-- ENDIF -->
+
+		<!-- IF S_HAS_EVENTS -->
+		<ul class="ecal-day-events">
+			<!-- BEGIN events -->
+			<li class="ecal-chip ecal-c{events.COLOR}<!-- IF events.IS_SPECIAL --> ecal-special<!-- ENDIF -->">
+				<!-- IF events.ALL_DAY -->
+				<span class="ecal-chip-time">{L_ECAL_ALL_DAY}</span>
+				<!-- ELSE -->
+				<span class="ecal-chip-time">{events.TIME}</span>
+				<!-- ENDIF -->
+				<a class="ecal-chip-title" href="{events.U_EVENT}">{events.TITLE}</a>
+			</li>
+			<!-- END events -->
+		</ul>
+		<!-- ELSE -->
+		<p>{L_ECAL_NO_EVENTS_TODAY}</p>
+		<!-- ENDIF -->
+	</div>
+</div>
+
+<!-- INCLUDE overall_footer.html -->

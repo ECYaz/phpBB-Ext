@@ -1,0 +1,91 @@
+<!-- INCLUDE overall_header.html -->
+
+<h1>{L_ACP_ECAL_SETTINGS}</h1>
+
+<p>{L_ACP_ECAL_SETTINGS_EXPLAIN}</p>
+
+<form id="acp_ecal_settings" method="post" action="{U_ACTION}">
+	<fieldset>
+		<legend>{L_ACP_ECAL_SETTINGS}</legend>
+		<dl>
+			<dt><label for="ecal_index_display">{L_ECAL_INDEX_DISPLAY}{L_COLON}</label><br /><span>{L_ECAL_INDEX_DISPLAY_EXPLAIN}</span></dt>
+			<dd>
+				<select id="ecal_index_display" name="ecal_index_display">
+					<option value="0"<!-- IF ECAL_INDEX_DISPLAY eq 0 --> selected="selected"<!-- ENDIF -->>{L_ECAL_INDEX_DISPLAY_OFF}</option>
+					<option value="1"<!-- IF ECAL_INDEX_DISPLAY eq 1 --> selected="selected"<!-- ENDIF -->>{L_ECAL_INDEX_DISPLAY_UPCOMING}</option>
+					<option value="2"<!-- IF ECAL_INDEX_DISPLAY eq 2 --> selected="selected"<!-- ENDIF -->>{L_ECAL_INDEX_DISPLAY_MINI}</option>
+					<option value="3"<!-- IF ECAL_INDEX_DISPLAY eq 3 --> selected="selected"<!-- ENDIF -->>{L_ECAL_INDEX_DISPLAY_BOTH}</option>
+				</select>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="ecal_index_upcoming_count">{L_ECAL_INDEX_UPCOMING_COUNT}{L_COLON}</label><br /><span>{L_ECAL_INDEX_UPCOMING_COUNT_EXPLAIN}</span></dt>
+			<dd><input type="number" id="ecal_index_upcoming_count" name="ecal_index_upcoming_count" value="{ECAL_INDEX_UPCOMING_COUNT}" min="1" max="50" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="ecal_reminder_days">{L_ECAL_REMINDER_DAYS}{L_COLON}</label><br /><span>{L_ECAL_REMINDER_DAYS_EXPLAIN}</span></dt>
+			<dd><input type="number" id="ecal_reminder_days" name="ecal_reminder_days" value="{ECAL_REMINDER_DAYS}" min="0" max="30" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="ecal_topic_forum_id">{L_ECAL_TOPIC_FORUM_ID}{L_COLON}</label><br /><span>{L_ECAL_TOPIC_FORUM_ID_EXPLAIN}</span></dt>
+			<dd><select id="ecal_topic_forum_id" name="ecal_topic_forum_id">{S_ECAL_TOPIC_FORUM_OPTIONS}</select></dd>
+		</dl>
+		<dl>
+			<dt><label for="ecal_birthdays_enable">{L_ECAL_BIRTHDAYS_ENABLE}{L_COLON}</label><br /><span>{L_ECAL_BIRTHDAYS_ENABLE_EXPLAIN}</span></dt>
+			<dd>
+				<label><input type="radio" name="ecal_birthdays_enable" value="1"<!-- IF S_ECAL_BIRTHDAYS_ENABLE --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+				<label><input type="radio" name="ecal_birthdays_enable" value="0"<!-- IF not S_ECAL_BIRTHDAYS_ENABLE --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+			</dd>
+		</dl>
+	</fieldset>
+	<fieldset>
+		<legend>{L_ACP_ECAL_ICS_TITLE}</legend>
+		<dl>
+			<dt><label for="ecal_ics_enable">{L_ECAL_ICS_ENABLE}{L_COLON}</label><br /><span>{L_ECAL_ICS_ENABLE_EXPLAIN}</span></dt>
+			<dd>
+				<label><input type="radio" name="ecal_ics_enable" value="1"<!-- IF S_ECAL_ICS_ENABLE --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+				<label><input type="radio" name="ecal_ics_enable" value="0"<!-- IF not S_ECAL_ICS_ENABLE --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="ecal_ics_public">{L_ECAL_ICS_PUBLIC}{L_COLON}</label><br /><span>{L_ECAL_ICS_PUBLIC_EXPLAIN}</span></dt>
+			<dd>
+				<label><input type="radio" name="ecal_ics_public" value="1"<!-- IF S_ECAL_ICS_PUBLIC --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+				<label><input type="radio" name="ecal_ics_public" value="0"<!-- IF not S_ECAL_ICS_PUBLIC --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+			</dd>
+		</dl>
+		<dl>
+			<!-- ECAL_ICS_TOKEN/ECAL_ICS_FEED_URL are safe ASCII hex / a URL
+			     built from that same hex (see acp/main_module.php's main()
+			     comment) -- never through $request->variable(), assigned raw
+			     like every other plain config value, no `|e` needed. -->
+			<dt><label for="ecal_ics_token">{L_ECAL_ICS_TOKEN}{L_COLON}</label><br /><span>{L_ECAL_ICS_TOKEN_EXPLAIN}</span></dt>
+			<dd><input type="text" id="ecal_ics_token" value="{ECAL_ICS_TOKEN}" size="40" readonly="readonly" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="ecal_ics_feed_url">{L_ECAL_ICS_FEED_URL}{L_COLON}</label></dt>
+			<dd><input type="text" id="ecal_ics_feed_url" value="{ECAL_ICS_FEED_URL}" size="60" readonly="readonly" onclick="this.select();" /></dd>
+		</dl>
+	</fieldset>
+	<fieldset>
+		<legend>{L_ACP_SUBMIT_CHANGES}</legend>
+		<p class="submit-buttons">
+			<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />&nbsp;
+			<input class="button2" type="reset" id="reset" name="reset" value="{L_RESET}" />
+		</p>
+		{S_FORM_TOKEN}
+	</fieldset>
+</form>
+
+<form id="acp_ecal_ics_regenerate" method="post" action="{U_ACTION}">
+	<fieldset>
+		<legend>{L_ACP_ECAL_ICS_REGENERATE}</legend>
+		<p>{L_ACP_ECAL_ICS_REGENERATE_EXPLAIN}</p>
+		<p class="submit-buttons">
+			<input class="button1" type="submit" name="regenerate_token" value="{L_ACP_ECAL_ICS_REGENERATE}" />
+		</p>
+		{S_FORM_TOKEN}
+	</fieldset>
+</form>
+
+<!-- INCLUDE overall_footer.html -->

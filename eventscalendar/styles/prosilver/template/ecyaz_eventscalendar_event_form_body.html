@@ -1,0 +1,83 @@
+<!-- INCLUDECSS @ecyaz_eventscalendar/eventscalendar.css -->
+<!-- INCLUDE overall_header.html -->
+
+<div id="ecal-event-form" class="panel">
+	<div class="inner">
+		<h2><!-- IF S_EDIT -->{L_ECAL_EDIT_EVENT}<!-- ELSE -->{L_ECAL_NEW_EVENT}<!-- ENDIF --></h2>
+
+		<!-- IF ERROR -->
+		<div class="errorbox">
+			<p>{ERROR}</p>
+		</div>
+		<!-- ENDIF -->
+
+		<form id="ecal-event-form-form" method="post" action="{U_ACTION}">
+			<fieldset>
+				<dl>
+					<dt><label for="title">{L_ECAL_TITLE}{L_COLON}</label></dt>
+					<dd><input type="text" id="title" name="title" value="{TITLE}" maxlength="255" required /></dd>
+				</dl>
+				<dl>
+					<dt><label for="description">{L_ECAL_DESCRIPTION}{L_COLON}</label></dt>
+					<dd><textarea id="description" name="description" rows="6" cols="60">{DESCRIPTION}</textarea></dd>
+				</dl>
+				<dl>
+					<dt><label for="all_day">{L_ECAL_ALL_DAY}{L_COLON}</label></dt>
+					<dd><input type="checkbox" id="all_day" name="all_day" value="1"<!-- IF S_ALL_DAY --> checked="checked"<!-- ENDIF --> /></dd>
+				</dl>
+				<dl>
+					<dt><label for="start_date">{L_ECAL_START}{L_COLON}</label></dt>
+					<dd>
+						<input type="date" id="start_date" name="start_date" value="{START_DATE}" />
+						<input type="time" id="start_time" name="start_time" value="{START_TIME}" />
+					</dd>
+				</dl>
+				<dl>
+					<dt><label for="end_date">{L_ECAL_END}{L_COLON}</label></dt>
+					<dd>
+						<input type="date" id="end_date" name="end_date" value="{END_DATE}" />
+						<input type="time" id="end_time" name="end_time" value="{END_TIME}" />
+					</dd>
+				</dl>
+				<dl>
+					<dt><label for="recur_type">{L_ECAL_RECURRENCE}{L_COLON}</label></dt>
+					<dd>
+						<select id="recur_type" name="recur_type">
+							<!-- BEGIN recur_options -->
+							<option value="{recur_options.VALUE}"<!-- IF recur_options.S_SELECTED --> selected="selected"<!-- ENDIF -->>{recur_options.LABEL}</option>
+							<!-- END recur_options -->
+						</select>
+					</dd>
+				</dl>
+				<dl>
+					<dt><label for="recur_until">{L_ECAL_RECUR_UNTIL}{L_COLON}</label></dt>
+					<dd><input type="date" id="recur_until" name="recur_until" value="{RECUR_UNTIL}" /></dd>
+				</dl>
+				<dl>
+					<dt><label for="color">{L_ECAL_COLOR}{L_COLON}</label></dt>
+					<dd>
+						<select id="color" name="color">
+							<!-- BEGIN color_options -->
+							<option value="{color_options.VALUE}"<!-- IF color_options.S_SELECTED --> selected="selected"<!-- ENDIF -->>{color_options.LABEL}</option>
+							<!-- END color_options -->
+						</select>
+					</dd>
+				</dl>
+				<!-- IF S_CAN_TOPIC -->
+				<dl>
+					<dt><label for="post_topic">{L_ECAL_POST_TOPIC}{L_COLON}</label></dt>
+					<dd><input type="checkbox" id="post_topic" name="post_topic" value="1"<!-- IF S_POST_TOPIC --> checked="checked"<!-- ENDIF --> /></dd>
+				</dl>
+				<!-- ENDIF -->
+			</fieldset>
+
+			<fieldset class="submit-buttons">
+				<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />
+				<a class="button2" href="{U_BACK}">{L_CANCEL}</a>
+				{S_FORM_TOKEN}
+			</fieldset>
+		</form>
+	</div>
+</div>
+
+<!-- INCLUDE overall_footer.html -->

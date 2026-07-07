@@ -1,0 +1,78 @@
+<!-- INCLUDECSS @ecyaz_eventscalendar/eventscalendar.css -->
+<!-- INCLUDE overall_header.html -->
+
+<div id="ecal-event" class="panel">
+	<div class="inner">
+		<h2>{TITLE}</h2>
+
+		<p class="ecal-event-meta">
+			<span class="ecal-c{COLOR}">&#9679;</span>
+			<!-- IF ALL_DAY -->
+			{L_ECAL_ALL_DAY}
+			<!-- ELSE -->
+			{START} &ndash; {END}
+			<!-- ENDIF -->
+		</p>
+
+		<!-- IF RECUR_LABEL -->
+		<p class="ecal-event-recur">{RECUR_LABEL}</p>
+		<!-- ENDIF -->
+
+		<div class="ecal-event-description">
+			{DESCRIPTION}
+		</div>
+
+		<!-- IF S_HAS_TOPIC -->
+		<p><a href="{U_TOPIC}">{L_ECAL_VIEW_TOPIC}</a></p>
+		<!-- ENDIF -->
+
+		<!-- IF S_CAN_MANAGE -->
+		<div class="ecal-event-actions">
+			<a class="button2" href="{U_EDIT}">{L_ECAL_EDIT}</a>
+			<a class="button2" href="{U_DELETE}">{L_ECAL_DELETE}</a>
+		</div>
+		<!-- ENDIF -->
+
+		<div class="ecal-event-rsvp">
+			<h3>
+				<!-- IF S_IS_RECURRING -->
+				{L_ECAL_RSVP_UPCOMING_OCCURRENCES}
+				<!-- ELSE -->
+				{L_ECAL_RSVP_ATTENDEES}
+				<!-- ENDIF -->
+			</h3>
+
+			<!-- BEGIN occurrence -->
+			<div class="ecal-occurrence" id="ecal-occurrence-{occurrence.OCCURRENCE_TS}">
+				<p class="ecal-occurrence-when">{occurrence.WHEN}</p>
+
+				<!-- IF S_CAN_ATTEND -->
+				<form method="post" action="{U_ATTEND}" id="ecal-attend-form-{occurrence.OCCURRENCE_TS}">
+					<input type="hidden" name="occurrence_ts" value="{occurrence.OCCURRENCE_TS}" />
+					{S_FORM_TOKEN}
+					<!-- IF occurrence.S_ATTENDING -->
+					<input class="button2" type="submit" value="{L_ECAL_RSVP_UNATTEND}" />
+					<!-- ELSE -->
+					<input class="button2" type="submit" value="{L_ECAL_RSVP_ATTEND}" />
+					<!-- ENDIF -->
+				</form>
+				<!-- ENDIF -->
+
+				<!-- IF occurrence.ATTENDEE_COUNT -->
+				<ul class="ecal-attendee-list">
+					<!-- BEGIN attendee -->
+					<li>{occurrence.attendee.AVATAR} {occurrence.attendee.USERNAME}</li>
+					<!-- END attendee -->
+				</ul>
+				<!-- ELSE -->
+				<p class="ecal-no-attendees">{L_ECAL_RSVP_NO_ATTENDEES}</p>
+				<!-- ENDIF -->
+			</div>
+			<!-- END occurrence -->
+		</div>
+
+		<p><a href="{U_BACK}">{L_ECAL_BACK_TO_MONTH}</a></p>
+	</div>
+</div>
+
+<!-- INCLUDE overall_footer.html -->

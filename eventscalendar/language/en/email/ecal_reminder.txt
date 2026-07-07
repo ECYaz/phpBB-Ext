@@ -1,0 +1,18 @@
+Subject: <!-- IF REASON == 'cancelled' -->Event cancelled: {EVENT_TITLE}<!-- ELSEIF REASON == 'updated' -->Event updated: {EVENT_TITLE}<!-- ELSE -->Reminder: {EVENT_TITLE}<!-- ENDIF -->
+
+Hello {USERNAME},
+
+<!-- IF REASON == 'cancelled' -->
+The event "{EVENT_TITLE}", which you were attending, has been cancelled.
+<!-- ELSEIF REASON == 'updated' -->
+The event "{EVENT_TITLE}", which you are attending, has been updated.
+<!-- ELSE -->
+This is a reminder that the event "{EVENT_TITLE}" is coming up.
+<!-- ENDIF -->
+
+When: {EVENT_WHEN}
+
+You can view the event here:
+{U_EVENT}
+
+{EMAIL_SIG}

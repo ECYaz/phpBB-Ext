@@ -1,0 +1,38 @@
+<!-- INCLUDECSS @ecyaz_eventscalendar/eventscalendar.css -->
+<!-- INCLUDE overall_header.html -->
+
+<div id="ecal-year" class="panel">
+	<div class="inner">
+		<h2>{YEAR}</h2>
+
+		<div class="ecal-toolbar">
+			<div class="ecal-nav">
+				<a class="button2" href="{U_PREV}">&laquo; {L_ECAL_PREV}</a>
+				<a class="button2" href="{U_NEXT}">{L_ECAL_NEXT} &raquo;</a>
+			</div>
+		</div>
+
+		<div class="ecal-year-grid">
+			<!-- BEGIN months -->
+			<div class="ecal-mini-month">
+				<h3><a href="{months.U_VIEW}">{months.LABEL}</a></h3>
+				<table class="ecal-mini-grid">
+					<tbody>
+						<!-- BEGIN months.weeks -->
+						<tr>
+							<!-- BEGIN months.weeks.days -->
+							<td class="ecal-mini-day<!-- IF months.weeks.days.IS_OTHER_MONTH --> ecal-other-month<!-- ENDIF --><!-- IF months.weeks.days.IS_TODAY --> ecal-today<!-- ENDIF -->">
+								<a href="{months.weeks.days.U_DAY}">{months.weeks.days.DAY_NUM}<!-- IF months.weeks.days.HAS_EVENTS --><span class="ecal-mini-dot"></span><!-- ENDIF --><!-- IF months.weeks.days.HAS_BIRTHDAYS --><span class="ecal-mini-dot ecal-mini-dot-birthday"></span><!-- ENDIF --></a>
+							</td>
+							<!-- END months.weeks.days -->
+						</tr>
+						<!-- END months.weeks -->
+					</tbody>
+				</table>
+			</div>
+			<!-- END months -->
+		</div>
+	</div>
+</div>
+
+<!-- INCLUDE overall_footer.html -->

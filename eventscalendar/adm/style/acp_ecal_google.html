@@ -1,0 +1,151 @@
+<!-- INCLUDE overall_header.html -->
+
+<h1>{L_ACP_ECAL_GOOGLE}</h1>
+
+<p>{L_ACP_ECAL_GOOGLE_EXPLAIN}</p>
+
+<!-- IF S_ECAL_TEST_RESULT -->
+	<!-- Escaped here (Twig `|e`, html strategy) rather than in PHP: this
+	     string is a caught \Throwable::getMessage() that can embed a raw
+	     Google/proxy HTTP response body verbatim (see acp/main_module.php's
+	     assign_google_template_vars() comment for why the escape lives
+	     here instead of at template-assignment time). -->
+	<!-- IF S_ECAL_TEST_SUCCESS -->
+		<div class="successbox">{ECAL_TEST_MESSAGE|e}</div>
+	<!-- ELSE -->
+		<div class="errorbox">{ECAL_TEST_MESSAGE|e}</div>
+	<!-- ENDIF -->
+<!-- ENDIF -->
+
+<form id="acp_ecal_google" method="post" action="{U_ACTION}">
+	<fieldset>
+		<legend>{L_ACP_ECAL_GOOGLE}</legend>
+		<dl>
+			<dt><label for="ecal_gcal_enable">{L_ECAL_GCAL_ENABLE}{L_COLON}</label><br /><span>{L_ECAL_GCAL_ENABLE_EXPLAIN}</span></dt>
+			<dd>
+				<label><input type="radio" name="ecal_gcal_enable" value="1"<!-- IF S_ECAL_GCAL_ENABLE --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+				<label><input type="radio" name="ecal_gcal_enable" value="0"<!-- IF not S_ECAL_GCAL_ENABLE --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="ecal_gcal_calendar_id">{L_ECAL_GCAL_CALENDAR_ID}{L_COLON}</label><br /><span>{L_ECAL_GCAL_CALENDAR_ID_EXPLAIN}</span></dt>
+			<dd><input type="text" id="ecal_gcal_calendar_id" name="ecal_gcal_calendar_id" value="{ECAL_GCAL_CALENDAR_ID}" size="60" maxlength="255" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="ecal_gcal_sa_json">{L_ECAL_GCAL_SA_JSON}{L_COLON}</label><br /><span>
+				<!-- IF S_ECAL_SA_CONFIGURED -->
+					<!-- IF ECAL_SA_CLIENT_EMAIL -->
+						<!-- client_email is parsed straight out of the stored
+						     service-account JSON, never through
+						     $request->variable() -- escaped here (Twig `|e`)
+						     rather than in PHP, see acp/main_module.php's
+						     assign_google_template_vars() comment. -->
+						{L_ACP_ECAL_GOOGLE_SA_CONFIGURED} ({ECAL_SA_CLIENT_EMAIL|e})
+					<!-- ELSE -->
+						{L_ACP_ECAL_GOOGLE_SA_CONFIGURED}
+					<!-- ENDIF -->
+				<!-- ELSE -->
+					{L_ACP_ECAL_GOOGLE_SA_NOT_CONFIGURED}
+				<!-- ENDIF -->
+				— {L_ECAL_GCAL_SA_JSON_EXPLAIN}
+			</span></dt>
+			<dd><textarea id="ecal_gcal_sa_json" name="ecal_gcal_sa_json" rows="6" cols="60" placeholder="{L_ACP_ECAL_GOOGLE_SA_REPLACE_PLACEHOLDER}"></textarea></dd>
+		</dl>
+		<dl>
+			<dt>{L_ACP_ECAL_GOOGLE_STATUS}{L_COLON}</dt>
+			<!-- ecal_gcal_status can carry a raw Google/proxy HTTP error
+			     body (see cron/gcal_sync.php's update_status()) -- escaped
+			     here (Twig `|e`) rather than in PHP, same reason as
+			     ECAL_TEST_MESSAGE above. -->
+			<dd>{ECAL_GCAL_STATUS|e}</dd>
+		</dl>
+	</fieldset>
+	<fieldset>
+		<legend>{L_ACP_SUBMIT_CHANGES}</legend>
+		<p class="submit-buttons">
+			<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />&nbsp;
+			<input class="button2" type="reset" id="reset" name="reset" value="{L_RESET}" />
+		</p>
+		{S_FORM_TOKEN}
+	</fieldset>
+</form>
+
+<form id="acp_ecal_google_test" method="post" action="{U_ACTION}">
+	<fieldset>
+		<legend>{L_ACP_ECAL_GOOGLE_TEST_CONNECTION}</legend>
+		<p>{L_ACP_ECAL_GOOGLE_TEST_CONNECTION_EXPLAIN}</p>
+		<p class="submit-buttons">
+			<input class="button1" type="submit" name="test_connection" value="{L_ACP_ECAL_GOOGLE_TEST_CONNECTION}" />
+		</p>
+		{S_FORM_TOKEN}
+	</fieldset>
+</form>
+
+<form id="acp_ecal_google_resync" method="post" action="{U_ACTION}">
+	<fieldset>
+		<legend>{L_ACP_ECAL_GOOGLE_RESYNC}</legend>
+		<p>{L_ACP_ECAL_GOOGLE_RESYNC_EXPLAIN}</p>
+		<p class="submit-buttons">
+			<input class="button1" type="submit" name="resync_all" value="{L_ACP_ECAL_GOOGLE_RESYNC}" />
+		</p>
+		{S_FORM_TOKEN}
+	</fieldset>
+</form>
+
+<form id="acp_ecal_google_queue" method="post" action="{U_ACTION}">
+	<fieldset>
+		<legend>{L_ACP_ECAL_GOOGLE_QUEUE_TITLE}</legend>
+		<!-- IF .ecal_gcal_queue -->
+		<table class="table1" cellspacing="1">
+			<thead>
+				<tr>
+					<th>{L_ACP_ECAL_GOOGLE_QUEUE_EVENT}</th>
+					<th>{L_ACP_ECAL_GOOGLE_QUEUE_ACTION}</th>
+					<th>{L_ACP_ECAL_GOOGLE_QUEUE_ATTEMPTS}</th>
+					<th>{L_ACP_ECAL_GOOGLE_QUEUE_NEXT_RETRY}</th>
+					<th>{L_ACP_ECAL_GOOGLE_QUEUE_LAST_ERROR}</th>
+					<th>{L_ACP_ECAL_GOOGLE_QUEUE_ACTIONS}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- BEGIN ecal_gcal_queue -->
+				<tr>
+					<td>{ecal_gcal_queue.EVENT_TITLE}</td>
+					<td>{ecal_gcal_queue.L_ACTION}</td>
+					<td>{ecal_gcal_queue.ATTEMPTS}<!-- IF ecal_gcal_queue.S_DEAD --> ({L_ACP_ECAL_GOOGLE_QUEUE_DEAD})<!-- ENDIF --></td>
+					<td>{ecal_gcal_queue.NEXT_RETRY}</td>
+					<!-- last_error is a caught \Throwable::getMessage() that
+					     can embed a raw Google/proxy HTTP error body (see
+					     outbox::mark_failed()) -- escaped here (Twig `|e`)
+					     rather than in PHP, same reason as
+					     ECAL_TEST_MESSAGE/ECAL_GCAL_STATUS above. -->
+					<td>{ecal_gcal_queue.LAST_ERROR|e}</td>
+					<td>
+						<button type="submit" class="button2" name="retry[{ecal_gcal_queue.OUTBOX_ID}]" value="1">{L_ACP_ECAL_GOOGLE_RETRY}</button>
+						<button type="submit" class="button2" name="discard[{ecal_gcal_queue.OUTBOX_ID}]" value="1">{L_ACP_ECAL_GOOGLE_DISCARD}</button>
+					</td>
+				</tr>
+				<!-- END ecal_gcal_queue -->
+			</tbody>
+		</table>
+		<!-- ELSE -->
+		<p>{L_ACP_ECAL_GOOGLE_QUEUE_EMPTY}</p>
+		<!-- ENDIF -->
+		{S_FORM_TOKEN}
+	</fieldset>
+</form>
+
+<div class="rowbg">
+	<div class="row">
+		<h3>{L_ACP_ECAL_GOOGLE_SETUP_TITLE}</h3>
+		<ol>
+			<li>{L_ACP_ECAL_GOOGLE_SETUP_STEP_1}</li>
+			<li>{L_ACP_ECAL_GOOGLE_SETUP_STEP_2}</li>
+			<li>{L_ACP_ECAL_GOOGLE_SETUP_STEP_3}</li>
+			<li>{L_ACP_ECAL_GOOGLE_SETUP_STEP_4}</li>
+			<li>{L_ACP_ECAL_GOOGLE_SETUP_STEP_5}</li>
+		</ol>
+	</div>
+</div>
+
+<!-- INCLUDE overall_footer.html -->

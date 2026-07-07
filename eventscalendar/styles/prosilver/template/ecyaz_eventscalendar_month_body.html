@@ -1,0 +1,57 @@
+<!-- INCLUDECSS @ecyaz_eventscalendar/eventscalendar.css -->
+<!-- INCLUDE overall_header.html -->
+
+<div id="ecal-month" class="panel">
+	<div class="inner">
+		<h2>{MONTH_LABEL}</h2>
+
+		<div class="ecal-toolbar">
+			<div class="ecal-nav">
+				<a class="button2" href="{U_PREV}">&laquo; {L_ECAL_PREV}</a>
+				<a class="button2" href="{U_TODAY}">{L_ECAL_TODAY}</a>
+				<a class="button2" href="{U_NEXT}">{L_ECAL_NEXT} &raquo;</a>
+			</div>
+			<div class="ecal-view-switch">
+				<a class="button2" href="{U_YEAR}">{L_ECAL_YEAR_VIEW}</a>
+				<a class="button2" href="{U_SEARCH}">{L_ECAL_SEARCH}</a>
+				<!-- IF S_CAN_POST -->
+				<a class="button1" href="{U_EVENT_ADD}">{L_ECAL_ADD_EVENT}</a>
+				<!-- ENDIF -->
+			</div>
+		</div>
+
+		<table id="ecal-month-grid" class="ecal-grid">
+			<thead>
+				<tr>
+					<!-- BEGIN weekday_headers -->
+					<th>{weekday_headers.LABEL}</th>
+					<!-- END weekday_headers -->
+				</tr>
+			</thead>
+			<tbody>
+				<!-- BEGIN weeks -->
+				<tr>
+					<!-- BEGIN weeks.days -->
+					<td class="ecal-day<!-- IF weeks.days.IS_OTHER_MONTH --> ecal-other-month<!-- ENDIF --><!-- IF weeks.days.IS_TODAY --> ecal-today<!-- ENDIF -->">
+						<a class="ecal-day-num" href="{weeks.days.U_DAY}">{weeks.days.DAY_NUM}</a>
+
+						<!-- BEGIN weeks.days.birthdays -->
+						<div class="ecal-birthday-chip" title="{L_ECAL_BIRTHDAYS}">&#127874; {weeks.days.birthdays.USERNAME}</div>
+						<!-- END weeks.days.birthdays -->
+
+						<!-- BEGIN weeks.days.events -->
+						<div class="ecal-chip ecal-c{weeks.days.events.COLOR} ecal-bar-{weeks.days.events.BAR}<!-- IF weeks.days.events.IS_SPECIAL --> ecal-special<!-- ENDIF -->">
+							<!-- IF weeks.days.events.TIME --><span class="ecal-chip-time">{weeks.days.events.TIME}</span><!-- ENDIF -->
+							<a class="ecal-chip-title" href="{weeks.days.events.U_EVENT}">{weeks.days.events.TITLE}</a>
+						</div>
+						<!-- END weeks.days.events -->
+					</td>
+					<!-- END weeks.days -->
+				</tr>
+				<!-- END weeks -->
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<!-- INCLUDE overall_footer.html -->

@@ -1,0 +1,18 @@
+Subject: <!-- IF REASON == 'cancelled' -->Événement annulé : {EVENT_TITLE}<!-- ELSEIF REASON == 'updated' -->Événement modifié : {EVENT_TITLE}<!-- ELSE -->Rappel : {EVENT_TITLE}<!-- ENDIF -->
+
+Bonjour {USERNAME},
+
+<!-- IF REASON == 'cancelled' -->
+L'événement « {EVENT_TITLE} », auquel vous participiez, a été annulé.
+<!-- ELSEIF REASON == 'updated' -->
+L'événement « {EVENT_TITLE} », auquel vous participez, a été modifié.
+<!-- ELSE -->
+Ceci est un rappel : l'événement « {EVENT_TITLE} » approche.
+<!-- ENDIF -->
+
+Quand : {EVENT_WHEN}
+
+Vous pouvez consulter l'événement ici :
+{U_EVENT}
+
+{EMAIL_SIG}

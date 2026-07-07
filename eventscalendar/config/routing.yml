@@ -1,0 +1,71 @@
+ecyaz_eventscalendar_search:
+    path: /calendar/search
+    methods:          [GET]
+    defaults: { _controller: ecyaz.eventscalendar.controller.calendar:search }
+
+ecyaz_eventscalendar_day:
+    path: /calendar/{year}/{month}/{day}
+    methods:      [GET]
+    requirements: { year: '\d{4}', month: '\d{1,2}', day: '\d{1,2}' }
+    defaults: { _controller: ecyaz.eventscalendar.controller.calendar:day }
+
+ecyaz_eventscalendar_year:
+    path: /calendar/{year}
+    methods:      [GET]
+    requirements: { year: '\d{4}' }
+    defaults: { _controller: ecyaz.eventscalendar.controller.calendar:year }
+
+# NOTE: {year}/{month} both carry defaults (0/0) so this single route also
+# serves the bare /calendar path (current month). Declared AFTER
+# ecyaz_eventscalendar_year so /calendar/{year} (one segment) is matched by
+# ecyaz_eventscalendar_year first — Symfony tries routes in declaration
+# order and ecyaz_eventscalendar_month's pattern would otherwise also match
+# a lone {year} segment via its optional trailing {month}.
+ecyaz_eventscalendar_month:
+    path: /calendar/{year}/{month}
+    methods:      [GET]
+    requirements: { year: '\d{4}', month: '\d{1,2}' }
+    defaults: { _controller: ecyaz.eventscalendar.controller.calendar:month, year: 0, month: 0 }
+
+# Event CRUD (Task 4). event_add is declared BEFORE the {event_id} routes,
+# and every {event_id} route additionally constrains it to \d+ — either
+# alone is enough to keep /calendar/event/add from being swallowed by
+# {event_id}, but both together make the ordering dependency non-load-bearing.
+ecyaz_eventscalendar_event_add:
+    path: /calendar/event/add
+    methods:      [GET, POST]
+    defaults: { _controller: ecyaz.eventscalendar.controller.event:add }
+
+ecyaz_eventscalendar_event_edit:
+    path: /calendar/event/{event_id}/edit
+    methods:      [GET, POST]
+    requirements: { event_id: '\d+' }
+    defaults: { _controller: ecyaz.eventscalendar.controller.event:edit }
+
+ecyaz_eventscalendar_event_delete:
+    path: /calendar/event/{event_id}/delete
+    methods:      [GET, POST]
+    requirements: { event_id: '\d+' }
+    defaults: { _controller: ecyaz.eventscalendar.controller.event:delete }
+
+# Task 5: per-occurrence RSVP toggle. POST-only (no GET — attending is a
+# state-changing action, always CSRF-guarded via the form key).
+ecyaz_eventscalendar_event_attend:
+    path: /calendar/event/{event_id}/attend
+    methods:      [POST]
+    requirements: { event_id: '\d+' }
+    defaults: { _controller: ecyaz.eventscalendar.controller.event:attend }
+
+ecyaz_eventscalendar_event:
+    path: /calendar/event/{event_id}
+    methods:      [GET]
+    requirements: { event_id: '\d+' }
+    defaults: { _controller: ecyaz.eventscalendar.controller.event:view }
+
+# Task 7: ICS (iCalendar) feed. GET-only, no {event_id}-style dynamic
+# segment so it never competes with the routes above. Declared last since it
+# does not overlap any of them (a literal path, no requirements needed).
+ecyaz_eventscalendar_ics:
+    path: /calendar/feed.ics
+    methods:      [GET]
+    defaults: { _controller: ecyaz.eventscalendar.controller.feed:feed }

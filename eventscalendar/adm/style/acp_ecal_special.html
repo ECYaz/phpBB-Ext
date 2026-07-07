@@ -1,0 +1,89 @@
+<!-- INCLUDE overall_header.html -->
+
+<h1>{L_ACP_ECAL_SPECIAL}</h1>
+
+<p>{L_ACP_ECAL_SPECIAL_EXPLAIN}</p>
+
+<div class="rowbg">
+	<div class="row">
+		<h3>{L_ACP_ECAL_SPECIAL_LIST_TITLE}</h3>
+		<!-- IF .ecal_special -->
+		<table class="table1" cellspacing="1">
+			<thead>
+				<tr>
+					<th>{L_ACP_ECAL_SPECIAL_COL_TITLE}</th>
+					<th>{L_ACP_ECAL_SPECIAL_COL_DATE}</th>
+					<th>{L_ACP_ECAL_SPECIAL_COL_ANNUAL}</th>
+					<th>{L_ACP_ECAL_SPECIAL_COL_COLOR}</th>
+					<th>{L_ACP_ECAL_SPECIAL_COL_ACTIONS}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- BEGIN ecal_special -->
+				<tr>
+					<!-- title is escaped-at-input ($request->variable(..., true)
+					     on save, see acp/main_module.php's
+					     collect_special_form_data()) -- rendered raw here, same
+					     convention as every other event title in this
+					     codebase. -->
+					<td>{ecal_special.TITLE}</td>
+					<td>{ecal_special.DATE}</td>
+					<td><!-- IF ecal_special.S_ANNUAL -->{L_YES}<!-- ELSE -->{L_NO}<!-- ENDIF --></td>
+					<td><span style="display:inline-block;width:14px;height:14px;border-radius:2px;background-color:{ecal_special.COLOR_HEX};">&nbsp;</span></td>
+					<td>
+						<a href="{ecal_special.U_EDIT}">{L_EDIT}</a>
+						&nbsp;
+						<a href="{ecal_special.U_DELETE}">{L_DELETE}</a>
+					</td>
+				</tr>
+				<!-- END ecal_special -->
+			</tbody>
+		</table>
+		<!-- ELSE -->
+		<p>{L_ACP_ECAL_SPECIAL_LIST_EMPTY}</p>
+		<!-- ENDIF -->
+	</div>
+</div>
+
+<form id="acp_ecal_special_form" method="post" action="{U_ACTION}">
+	<fieldset>
+		<legend><!-- IF S_EDIT -->{L_ACP_ECAL_SPECIAL_EDIT}<!-- ELSE -->{L_ACP_ECAL_SPECIAL_ADD}<!-- ENDIF --></legend>
+
+		<!-- IF ERROR -->
+		<div class="errorbox">
+			<p>{ERROR}</p>
+		</div>
+		<!-- ENDIF -->
+
+		<dl>
+			<dt><label for="title">{L_ECAL_TITLE}{L_COLON}</label></dt>
+			<dd><input type="text" id="title" name="title" value="{TITLE}" maxlength="255" required /></dd>
+		</dl>
+		<dl>
+			<dt><label for="event_date">{L_ACP_ECAL_SPECIAL_DATE}{L_COLON}</label></dt>
+			<dd><input type="date" id="event_date" name="event_date" value="{EVENT_DATE}" required /></dd>
+		</dl>
+		<dl>
+			<dt><label for="annual">{L_ACP_ECAL_SPECIAL_ANNUAL}{L_COLON}</label><br /><span>{L_ACP_ECAL_SPECIAL_ANNUAL_EXPLAIN}</span></dt>
+			<dd><input type="checkbox" id="annual" name="annual" value="1"<!-- IF S_ANNUAL --> checked="checked"<!-- ENDIF --> /></dd>
+		</dl>
+		<dl>
+			<dt><label for="color">{L_ECAL_COLOR}{L_COLON}</label></dt>
+			<dd>
+				<select id="color" name="color">
+					<!-- BEGIN color_options -->
+					<option value="{color_options.VALUE}"<!-- IF color_options.S_SELECTED --> selected="selected"<!-- ENDIF -->>{color_options.LABEL}</option>
+					<!-- END color_options -->
+				</select>
+			</dd>
+		</dl>
+	</fieldset>
+	<fieldset class="submit-buttons">
+		<input type="hidden" name="event_id" value="{EVENT_ID}" />
+		<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />
+		<!-- IF S_EDIT -->&nbsp;<a class="button2" href="{U_ACTION}">{L_CANCEL}</a><!-- ENDIF -->
+		{S_FORM_TOKEN}
+	</fieldset>
+</form>
+
+<!-- INCLUDE overall_footer.html -->

@@ -1,0 +1,34 @@
+<!-- INCLUDECSS @ecyaz_eventscalendar/eventscalendar.css -->
+<!-- IF S_ECAL_UPCOMING -->
+<div class="stat-block ecal-index-upcoming">
+	<h3>{L_ECAL_UPCOMING_EVENTS}</h3>
+	<p>
+		<!-- IF S_ECAL_HAS_UPCOMING -->
+		<!-- BEGIN ecal_upcoming --><span class="ecal-chip ecal-c{ecal_upcoming.COLOR}<!-- IF ecal_upcoming.IS_SPECIAL --> ecal-special<!-- ENDIF -->"><a href="{ecal_upcoming.U_EVENT}">{ecal_upcoming.DATE}<!-- IF ecal_upcoming.TIME --> {ecal_upcoming.TIME}<!-- ENDIF --> &mdash; {ecal_upcoming.TITLE}</a></span><!-- IF not ecal_upcoming.S_LAST_ROW --><br /><!-- ENDIF --><!-- END ecal_upcoming -->
+		<!-- ELSE -->
+		{L_ECAL_NO_UPCOMING_EVENTS}
+		<!-- ENDIF -->
+	</p>
+	<p><a href="{U_ECAL_CALENDAR}">{L_ECAL_VIEW_CALENDAR}</a></p>
+</div>
+<!-- ENDIF -->
+
+<!-- IF S_ECAL_MINI -->
+<div class="stat-block ecal-index-mini">
+	<h3>{ECAL_MINI_LABEL}</h3>
+	<table class="ecal-mini-grid">
+		<tbody>
+			<!-- BEGIN ecal_mini_weeks -->
+			<tr>
+				<!-- BEGIN ecal_mini_weeks.days -->
+				<td class="ecal-mini-day<!-- IF ecal_mini_weeks.days.IS_OTHER_MONTH --> ecal-other-month<!-- ENDIF --><!-- IF ecal_mini_weeks.days.IS_TODAY --> ecal-today<!-- ENDIF -->">
+					<a href="{ecal_mini_weeks.days.U_DAY}">{ecal_mini_weeks.days.DAY_NUM}<!-- IF ecal_mini_weeks.days.HAS_EVENTS --><span class="ecal-mini-dot"></span><!-- ENDIF --><!-- IF ecal_mini_weeks.days.HAS_BIRTHDAYS --><span class="ecal-mini-dot ecal-mini-dot-birthday"></span><!-- ENDIF --></a>
+				</td>
+				<!-- END ecal_mini_weeks.days -->
+			</tr>
+			<!-- END ecal_mini_weeks -->
+		</tbody>
+	</table>
+	<p><a href="{U_ECAL_CALENDAR}">{L_ECAL_VIEW_CALENDAR}</a></p>
+</div>
+<!-- ENDIF -->

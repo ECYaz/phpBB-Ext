@@ -1,0 +1,44 @@
+<!-- INCLUDECSS @ecyaz_eventscalendar/eventscalendar.css -->
+<!-- INCLUDE overall_header.html -->
+
+<div id="ecal-search" class="panel">
+	<div class="inner">
+		<h2>{L_ECAL_SEARCH}</h2>
+
+		<form method="get" action="{U_SEARCH}">
+			<fieldset class="fields1">
+				<input type="search" name="q" value="{SEARCH_Q}" placeholder="{L_ECAL_SEARCH_PLACEHOLDER}" />
+				<label for="ecal-search-from">{L_ECAL_SEARCH_FROM}{L_COLON}</label>
+				<input type="date" id="ecal-search-from" name="from" value="{SEARCH_FROM}" />
+				<label for="ecal-search-to">{L_ECAL_SEARCH_TO}{L_COLON}</label>
+				<input type="date" id="ecal-search-to" name="to" value="{SEARCH_TO}" />
+				<input type="submit" class="button2" value="{L_SEARCH}" />
+			</fieldset>
+		</form>
+
+		<!-- IF S_HAS_QUERY -->
+		<h3>{L_ECAL_SEARCH_RESULTS}</h3>
+
+		<!-- IF S_HAS_RESULTS -->
+		<ul id="ecal-search-results" class="topiclist">
+			<!-- BEGIN results -->
+			<li class="row">
+				<dl>
+					<dt>
+						<span class="ecal-chip ecal-c{results.COLOR}<!-- IF results.IS_SPECIAL --> ecal-special<!-- ENDIF -->">
+							<a href="{results.U_EVENT}">{results.TITLE}</a>
+						</span>
+					</dt>
+					<dd>{results.DATE}<!-- IF results.TIME --> {results.TIME}<!-- ENDIF --></dd>
+				</dl>
+			</li>
+			<!-- END results -->
+		</ul>
+		<!-- ELSE -->
+		<p>{L_ECAL_NO_SEARCH_RESULTS}</p>
+		<!-- ENDIF -->
+		<!-- ENDIF -->
+	</div>
+</div>
+
+<!-- INCLUDE overall_footer.html -->

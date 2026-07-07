@@ -1,0 +1,163 @@
+services:
+    ecyaz.eventscalendar.recurrence:
+        class: ecyaz\eventscalendar\service\recurrence
+        arguments:
+            - '@config'
+
+    ecyaz.eventscalendar.calendar_view:
+        class: ecyaz\eventscalendar\service\calendar_view
+        arguments:
+            - '@dbal.conn'
+            - '@config'
+            - '@ecyaz.eventscalendar.recurrence'
+            - '%core.table_prefix%'
+
+    ecyaz.eventscalendar.controller.calendar:
+        class: ecyaz\eventscalendar\controller\calendar
+        arguments:
+            - '@auth'
+            - '@config'
+            - '@language'
+            - '@request'
+            - '@template'
+            - '@user'
+            - '@controller.helper'
+            - '@ecyaz.eventscalendar.calendar_view'
+
+    ecyaz.eventscalendar.outbox:
+        class: ecyaz\eventscalendar\service\outbox
+        arguments:
+            - '@dbal.conn'
+            - '@config'
+            - '@cache.driver'
+            - '%core.table_prefix%'
+
+    ecyaz.eventscalendar.notifier:
+        class: ecyaz\eventscalendar\service\notifier
+        arguments:
+            - '@notification_manager'
+            - '@user_loader'
+
+    ecyaz.eventscalendar.event_manager:
+        class: ecyaz\eventscalendar\service\event_manager
+        arguments:
+            - '@dbal.conn'
+            - '@config'
+            - '@ecyaz.eventscalendar.recurrence'
+            - '@ecyaz.eventscalendar.outbox'
+            - '@ecyaz.eventscalendar.notifier'
+            - '@user'
+            - '@controller.helper'
+            - '%core.table_prefix%'
+
+    ecyaz.eventscalendar.controller.event:
+        class: ecyaz\eventscalendar\controller\event
+        arguments:
+            - '@auth'
+            - '@config'
+            - '@language'
+            - '@request'
+            - '@template'
+            - '@user'
+            - '@controller.helper'
+            - '@ecyaz.eventscalendar.event_manager'
+            - '@dbal.conn'
+            - '@ecyaz.eventscalendar.recurrence'
+            - '@user_loader'
+            - '%core.table_prefix%'
+
+    ecyaz.eventscalendar.permissions_listener:
+        class: ecyaz\eventscalendar\event\permissions_listener
+        tags:
+            - { name: event.listener }
+
+    # ----- Reminder notifications + cron (Task 6) -----
+    # shared: false — required for every notification.type service, see
+    # config/default/container/services_notification.yml's own comment
+    # ("Service MUST NOT be shared for all the plugins to work").
+    ecyaz.eventscalendar.notification.type.reminder:
+        class: ecyaz\eventscalendar\notification\reminder
+        shared: false
+        parent: notification.type.base
+        calls:
+            - [set_helper, ['@controller.helper']]
+        tags:
+            - { name: notification.type }
+
+    ecyaz.eventscalendar.cron.reminders:
+        class: ecyaz\eventscalendar\cron\reminders
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@ecyaz.eventscalendar.recurrence'
+            - '@ecyaz.eventscalendar.notifier'
+            - '%core.table_prefix%'
+        calls:
+            - [set_name, [ecyaz.eventscalendar.cron.reminders]]
+        tags:
+            - { name: cron.task }
+
+    # ----- ICS feed (Task 7) -----
+    ecyaz.eventscalendar.ics:
+        class: ecyaz\eventscalendar\service\ics
+        arguments:
+            - '@dbal.conn'
+            - '@config'
+            - '@controller.helper'
+            - '%core.table_prefix%'
+
+    ecyaz.eventscalendar.controller.feed:
+        class: ecyaz\eventscalendar\controller\feed
+        arguments:
+            - '@config'
+            - '@cache.driver'
+            - '@request'
+            - '@ecyaz.eventscalendar.ics'
+
+    # ----- Google service-account auth + Calendar API client (Task 8) -----
+    ecyaz.eventscalendar.http_client:
+        class: ecyaz\eventscalendar\service\http_client
+
+    ecyaz.eventscalendar.gcal_auth:
+        class: ecyaz\eventscalendar\service\gcal_auth
+        arguments:
+            - '@config'
+            - '@config_text'
+            - '@ecyaz.eventscalendar.http_client'
+            - '@cache.driver'
+
+    ecyaz.eventscalendar.gcal_client:
+        class: ecyaz\eventscalendar\service\gcal_client
+        arguments:
+            - '@ecyaz.eventscalendar.gcal_auth'
+            - '@ecyaz.eventscalendar.http_client'
+            - '@config'
+            - '@ecyaz.eventscalendar.recurrence'
+
+    # ----- GCal sync cron (Task 9) -----
+    ecyaz.eventscalendar.cron.gcal_sync:
+        class: ecyaz\eventscalendar\cron\gcal_sync
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@ecyaz.eventscalendar.outbox'
+            - '@ecyaz.eventscalendar.gcal_client'
+            - '@controller.helper'
+            - '%core.table_prefix%'
+        calls:
+            - [set_name, [ecyaz.eventscalendar.cron.gcal_sync]]
+        tags:
+            - { name: cron.task }
+
+    ecyaz.eventscalendar.main_listener:
+        class: ecyaz\eventscalendar\event\main_listener
+        arguments:
+            - '@auth'
+            - '@config'
+            - '@controller.helper'
+            - '@language'
+            - '@template'
+            - '@user'
+            - '@ecyaz.eventscalendar.calendar_view'
+        tags:
+            - { name: event.listener }
