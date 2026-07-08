@@ -22,7 +22,7 @@ preview gate above applies.
 ## Download & install
 
 **Easiest — use the zip:** download
-[`forcePostPreview.zip`](../forcePostPreview.zip) (in the repository root) and
+[`forcePostPreview.zip`](https://github.com/ECYaz/phpBB-Ext/raw/main/forcePostPreview.zip) (in the repository root) and
 extract it into your board's `ext/` directory. It unpacks to
 `ext/ecyaz/forcepostpreview/`.
 

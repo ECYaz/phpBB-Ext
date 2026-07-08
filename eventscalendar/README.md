@@ -28,7 +28,7 @@ A full-featured events calendar for phpBB 3.3.x: month/year/day views on the boa
 
 ## Installation
 
-1. Download `eventscalendar.zip` (or copy the `eventscalendar/` source directory).
+1. Download [`eventscalendar.zip`](https://github.com/ECYaz/phpBB-Ext/raw/main/eventscalendar.zip) (or copy the `eventscalendar/` source directory).
 2. Extract/copy it into your board's `ext/` directory so the files end up at `ext/ecyaz/eventscalendar/`.
 3. In the phpBB Administration Control Panel go to **Customise → Manage extensions**.
 4. Find **Events Calendar** and click **Enable**. The extension's migrations run automatically, creating the calendar tables, seeding default configuration, the ACP module, notification type, and permissions.

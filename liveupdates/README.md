@@ -18,7 +18,7 @@ Pure progressive enhancement: with JavaScript off or the extension disabled, the
 - PHP 7.2+
 
 ## Install
-1. Copy to `ext/ecyaz/liveupdates/`.
+1. Download [`liveupdates.zip`](https://github.com/ECYaz/phpBB-Ext/raw/main/liveupdates.zip) and unzip it into your board's `ext/` directory (it unpacks to `ext/ecyaz/liveupdates/`), or copy this folder to `ext/ecyaz/liveupdates/`.
 2. ACP → Customise → Manage extensions → enable **Live Updates**.
 
 ## License

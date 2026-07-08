@@ -23,7 +23,7 @@ posting editor — new topic, reply, quote, edit, and private message compose.
 ## Download & install
 
 **Easiest — use the zip:** download
-[`postLengthReminder.zip`](../postLengthReminder.zip) (in the repository root) and
+[`postLengthReminder.zip`](https://github.com/ECYaz/phpBB-Ext/raw/main/postLengthReminder.zip) (in the repository root) and
 extract it into your board's `ext/` directory. It unpacks to
 `ext/ecyaz/postlengthreminder/`.
 

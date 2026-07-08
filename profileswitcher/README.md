@@ -19,7 +19,7 @@ Original authors: **Татьяна5** and **LavIgor**. Licensed under **GPL-2.0*
 ## Download & install
 
 **Easiest — use the zip:** download
-[`profileSwitcher.zip`](../profileSwitcher.zip)
+[`profileSwitcher.zip`](https://github.com/ECYaz/phpBB-Ext/raw/main/profileSwitcher.zip)
 (in the repository root) and extract it into your board's `ext/` directory. It
 unpacks to `ext/ecyaz/profileSwitcher/` automatically.
 

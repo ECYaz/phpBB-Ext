@@ -19,7 +19,7 @@ Out of the box, phpBB only enables the in-board (notification list) method for n
 
 ## Installation
 
-1. Download [`pmemaildefault.zip`](https://github.com/ECYaz/phpBB-Extensions/raw/main/pmemaildefault.zip).
+1. Download [`pmemaildefault.zip`](https://github.com/ECYaz/phpBB-Ext/raw/main/pmemaildefault.zip).
 2. Unzip it into your board's `ext/` directory so the files end up at
    `ext/ecyaz/pmemaildefault/`. (The archive already contains the `ecyaz/pmemaildefault/`
    folder structure, so you can extract it straight into `ext/`.)

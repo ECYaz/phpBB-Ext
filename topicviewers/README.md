@@ -24,7 +24,7 @@ list at the bottom of the topic page.
 ## Download & install
 
 **Easiest — use the zip:** download
-[`topicViewers.zip`](../topicViewers.zip) (in the repository root) and
+[`topicViewers.zip`](https://github.com/ECYaz/phpBB-Ext/raw/main/topicViewers.zip) (in the repository root) and
 extract it into your board's `ext/` directory. It unpacks to
 `ext/ecyaz/topicviewers/`.
 
