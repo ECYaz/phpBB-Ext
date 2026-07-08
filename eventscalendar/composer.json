@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Events calendar for phpBB 3.3 with Google Calendar push and iCal feed.",
     "homepage": "https://github.com/ECYaz/phpBB-Extensions",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "license": "GPL-2.0-only",
     "keywords": ["phpbb", "extension", "calendar", "events"],
     "authors": [{ "name": "ECYaz", "homepage": "https://github.com/ECYaz", "role": "Developer" }],

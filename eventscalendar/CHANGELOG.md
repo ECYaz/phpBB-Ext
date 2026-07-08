@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1 - 2026-07-08
+
+### Changed
+
+- The "Calendar" link in the header navigation bar now shows a calendar icon (Font Awesome `fa-calendar`), matching prosilver's icon convention.
+
 ## 1.0.0 - 2026-07-07
 
 First stable release.
