@@ -20,7 +20,6 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, [
 	'ACP_ECAL_TITLE'                     => 'Calendrier des événements',
-	'ACP_ECAL_SETTINGS'                  => 'Paramètres du calendrier des événements',
 	'ACP_ECAL_SETTINGS_EXPLAIN'          => 'Configurez l\'affichage du calendrier sur la page d\'accueil du forum et son comportement de base.',
 	'ACP_ECAL_SETTINGS_SAVED'            => 'Paramètres du calendrier des événements enregistrés.',
 
@@ -57,9 +56,7 @@ $lang = array_merge($lang, [
 	'ACP_ECAL_ICS_REGENERATE_EXPLAIN'    => 'Génère une nouvelle clé secrète et invalide immédiatement toute URL de flux privé précédemment émise. Quiconque utilise l\'ancienne URL de flux devra utiliser la nouvelle.',
 	'ACP_ECAL_ICS_TOKEN_REGENERATED'     => 'La clé secrète du flux de calendrier a été régénérée.',
 
-	'ACP_ECAL_GOOGLE'                    => 'Synchronisation Google',
 
-	'ACP_ECAL_SPECIAL'                   => 'Dates spéciales',
 	'ACP_ECAL_SPECIAL_EXPLAIN'           => 'Gérez les dates spéciales du forum (jours fériés, anniversaires et autres repères fixes) affichées sur le calendrier de tous les membres.',
 	'ACP_ECAL_SPECIAL_SAVED'             => 'La date spéciale a été enregistrée.',
 	'ACP_ECAL_SPECIAL_DELETED'           => 'La date spéciale a été supprimée.',

@@ -20,7 +20,6 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, [
 	'ACP_ECAL_TITLE'                     => 'Events Calendar',
-	'ACP_ECAL_SETTINGS'                  => 'Events Calendar settings',
 	'ACP_ECAL_SETTINGS_EXPLAIN'          => 'Configure how the calendar appears on the board index and its basic behaviour.',
 	'ACP_ECAL_SETTINGS_SAVED'            => 'Events Calendar settings saved.',
 
@@ -57,9 +56,7 @@ $lang = array_merge($lang, [
 	'ACP_ECAL_ICS_REGENERATE_EXPLAIN'    => 'Generates a new secret key and immediately invalidates every previously issued private feed URL. Anyone using the old feed URL will need the new one.',
 	'ACP_ECAL_ICS_TOKEN_REGENERATED'     => 'The calendar feed secret key has been regenerated.',
 
-	'ACP_ECAL_GOOGLE'                    => 'Google sync',
 
-	'ACP_ECAL_SPECIAL'                   => 'Special dates',
 	'ACP_ECAL_SPECIAL_EXPLAIN'           => 'Manage board-wide special dates (holidays, anniversaries, and similar fixed markers) shown on the calendar to every member.',
 	'ACP_ECAL_SPECIAL_SAVED'             => 'The special date has been saved.',
 	'ACP_ECAL_SPECIAL_DELETED'           => 'The special date has been deleted.',

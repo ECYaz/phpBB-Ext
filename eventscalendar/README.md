@@ -119,6 +119,26 @@ When **Reminder lead time (days)** is set above `0`, any member attending an eve
 
 ---
 
+## Development notes (phpBB harness)
+
+All commands run from `eventscalendar/`:
+
+```bash
+./.phpbb-harness/harness up        # start the Docker board
+./.phpbb-harness/harness enable    # enable the extension
+./.phpbb-harness/harness test      # PHPUnit (unit + functional)
+./.phpbb-harness/harness sniff     # phpcs with the phpBB coding-standard ruleset
+./.phpbb-harness/harness epv       # Extension Pre-Validator
+./.phpbb-harness/harness reset     # restore a clean DB snapshot
+./.phpbb-harness/harness purge     # purge the extension (drops its tables/config/module/permissions)
+./.phpbb-harness/harness disable   # disable without purging
+./.phpbb-harness/harness status    # board/Mailpit URLs, container status
+```
+
+The test suite (178 tests) covers recurrence expansion, RSVP state, notifications/reminders, the ICS feed (escaping, folding, RRULE generation), Google sync (fully mocked HTTP), and permission/ACP wiring, alongside install/purge migration symmetry.
+
+---
+
 ## License
 
 GPL-2.0-only — see `license.txt`.

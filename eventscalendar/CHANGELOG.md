@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.2 - 2026-07-08
+
+### Changed
+
+- The three ACP pages (Settings, Google sync, Special dates) are now grouped under their own "Events Calendar" category in the Extensions tab, giving the extension a proper left-hand menu block. Boards upgrading from 1.0.x are migrated automatically.
+- ACP menu titles moved to auto-loaded `info_acp_eventscalendar.php` language files (EN/FR), so they translate everywhere in the ACP, not only on the extension's own pages.
+
 ## 1.0.1 - 2026-07-08
 
 ### Changed
