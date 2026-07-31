@@ -35,8 +35,8 @@
             params.set('since', String(window.luIndexSince || Math.floor(Date.now() / 1000)));
             if (forum) { params.set('forum_id', forum.getAttribute('data-forum-id')); }
         }
-        if (surfaces.stats && document.querySelector('.stat-block.statistics')) { params.set('stats', '1'); }
-        if (surfaces.online && document.querySelector('.stat-block.online-list')) { params.set('online', '1'); }
+        if (surfaces.stats && document.getElementById('lu-stat-posts')) { params.set('stats', '1'); }
+        if (surfaces.online && document.getElementById('lu-online-users')) { params.set('online', '1'); }
         return params.toString();
     }
 
@@ -214,24 +214,27 @@
 
     /* ── Stats handler (P2-C) ────────────────────────────────────────────── */
 
+    // Server-rendered localized strings land in spans tagged by our PHP
+    // listener; nothing outside those spans is ever touched, so stats added
+    // by other extensions survive the refresh.
+    function setTagged(id, html) {
+        var el = document.getElementById(id);
+        if (el && typeof html === 'string' && html !== '') { el.innerHTML = html; }
+    }
+
     window.luHandleStats = function (stats) {
         if (!stats) { return; }
-        var strs = document.querySelectorAll('.stat-block.statistics strong');
-        if (strs.length < 4) { return; }
-        strs[0].textContent = stats.posts;
-        strs[1].textContent = stats.topics;
-        strs[2].textContent = stats.members;
-        var newestEl = strs[3].querySelector('a') || strs[3];
-        newestEl.textContent = stats.newest;
+        setTagged('lu-stat-posts', stats.posts_html);
+        setTagged('lu-stat-topics', stats.topics_html);
+        setTagged('lu-stat-members', stats.members_html);
+        setTagged('lu-stat-newest', stats.newest_html);
     };
 
     /* ── Online count handler (P2-C) ─────────────────────────────────────── */
 
     window.luHandleOnline = function (online) {
         if (!online) { return; }
-        var strs = document.querySelectorAll('.stat-block.online-list strong');
-        if (!strs.length) { return; }
-        strs[0].textContent = online.online;
+        setTagged('lu-online-users', online.html);
     };
 
     /* ── Index / forum banner handler (Task 13) ──────────────────────────── */

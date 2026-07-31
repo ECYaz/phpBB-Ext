@@ -39,8 +39,9 @@ class main_listener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
-			'core.user_setup'        => 'load_language',
-			'core.page_header_after' => 'inject_bootstrap',
+			'core.user_setup'              => 'load_language',
+			'core.page_header_after'       => 'inject_bootstrap',
+			'core.index_modify_page_title' => 'tag_index_stats',
 		];
 	}
 
@@ -51,10 +52,50 @@ class main_listener implements EventSubscriberInterface
 		$event['lang_set_ext'] = $lang_set_ext;
 	}
 
+	/**
+	 * Wrap the stats strings rendered on the board index in spans the poller
+	 * can address directly. Updating by position inside the stat block breaks
+	 * as soon as another extension injects its own values there.
+	 */
+	public function tag_index_stats($event)
+	{
+		if (!$this->is_active() || !$this->settings->surfaces()['stats'])
+		{
+			return;
+		}
+
+		foreach (['TOTAL_POSTS' => 'posts', 'TOTAL_TOPICS' => 'topics', 'TOTAL_USERS' => 'members', 'NEWEST_USER' => 'newest'] as $var => $key)
+		{
+			$value = $this->template->retrieve_var($var);
+
+			if (is_string($value) && $value !== '')
+			{
+				$this->template->assign_var($var, '<span id="lu-stat-' . $key . '">' . $value . '</span>');
+			}
+		}
+	}
+
+	protected function is_active()
+	{
+		$is_guest = (int) $this->user->data['user_id'] === ANONYMOUS;
+
+		return $this->settings->is_enabled() && (!$is_guest || $this->settings->is_guest_allowed());
+	}
+
 	public function inject_bootstrap($event)
 	{
 		$is_guest = (int) $this->user->data['user_id'] === ANONYMOUS;
 		$active = $this->settings->is_enabled() && (!$is_guest || $this->settings->is_guest_allowed());
+
+		if ($active && $this->settings->surfaces()['online'])
+		{
+			$online = $this->template->retrieve_var('TOTAL_USERS_ONLINE');
+
+			if (is_string($online) && $online !== '')
+			{
+				$this->template->assign_var('TOTAL_USERS_ONLINE', '<span id="lu-online-users">' . $online . '</span>');
+			}
+		}
 
 		$strings = [
 			'newReplies' => $this->language->lang('LIVEUPDATES_NEW_REPLIES'),

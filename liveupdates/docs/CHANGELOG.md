@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+- Fixed: the stats and who's-online refresh wrote values into `<strong>` elements by position, corrupting the display (and stats injected by other extensions) on boards where any extension adds content to those blocks. The values updated are now wrapped in extension-owned spans and replaced with complete server-rendered localized strings.
+- Fixed: the who's-online refresh updated only the total while the registered/hidden/guest breakdown went stale; the whole sentence is now refreshed together, so the numbers always agree.
+
 ## 0.2.0
 - Added live surfaces: private-message counter, who's-online count, and board statistics (each ACP-toggleable; index-only surfaces gated server-side to their page).
 

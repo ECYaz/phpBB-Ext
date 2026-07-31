@@ -26,6 +26,10 @@ class poll
 	protected $cache;
 	/** @var \phpbb\config\config */
 	protected $config;
+	/** @var \phpbb\language\language */
+	protected $language;
+	/** @var string */
+	protected $php_ext;
 
 	public function __construct(
 		\ecyaz\liveupdates\settings $settings,
@@ -35,7 +39,9 @@ class poll
 		\phpbb\request\request $request,
 		\phpbb\notification\manager $notification_manager,
 		\phpbb\cache\service $cache,
-		\phpbb\config\config $config
+		\phpbb\config\config $config,
+		\phpbb\language\language $language,
+		$php_ext
 	)
 	{
 		$this->settings = $settings;
@@ -46,6 +52,8 @@ class poll
 		$this->notification_manager = $notification_manager;
 		$this->cache = $cache;
 		$this->config = $config;
+		$this->language = $language;
+		$this->php_ext = $php_ext;
 	}
 
 	public function handle()
@@ -167,19 +175,41 @@ class poll
 
 	protected function stats_delta()
 	{
+		// Complete localized strings, mirroring what index.php renders. The
+		// client swaps them into spans tagged by the listener instead of
+		// guessing which <strong> on the page belongs to which value.
 		return [
-			'posts'   => (int) $this->config['num_posts'],
-			'topics'  => (int) $this->config['num_topics'],
-			'members' => (int) $this->config['num_users'],
-			'newest'  => (string) $this->config['newest_username'],
+			'posts'        => (int) $this->config['num_posts'],
+			'topics'       => (int) $this->config['num_topics'],
+			'members'      => (int) $this->config['num_users'],
+			'newest'       => (string) $this->config['newest_username'],
+			'posts_html'   => $this->language->lang('TOTAL_POSTS_COUNT', (int) $this->config['num_posts']),
+			'topics_html'  => $this->language->lang('TOTAL_TOPICS', (int) $this->config['num_topics']),
+			'members_html' => $this->language->lang('TOTAL_USERS', (int) $this->config['num_users']),
+			'newest_html'  => $this->language->lang('NEWEST_USER', get_username_string(
+				'full',
+				$this->config['newest_user_id'],
+				$this->config['newest_username'],
+				$this->config['newest_user_colour'],
+				false,
+				// Board-absolute profile URL: a route-relative one would break
+				// once injected into pages at a different path depth.
+				append_sid(generate_board_url() . '/memberlist.' . $this->php_ext, 'mode=viewprofile')
+			)),
 		];
 	}
 
 	protected function online_delta()
 	{
 		$online = obtain_users_online();
+		$online_strings = obtain_users_online_string($online);
 
-		return ['online' => (int) $online['total_online']];
+		// Full localized sentence so the total and the registered/hidden/guest
+		// breakdown always stay consistent with each other.
+		return [
+			'online' => (int) $online['total_online'],
+			'html'   => $online_strings['l_online_users'],
+		];
 	}
 
 	protected function index_delta()

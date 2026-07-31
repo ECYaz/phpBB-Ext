@@ -15,6 +15,8 @@ services:
             - '@notification_manager'
             - '@cache'
             - '@config'
+            - '@language'
+            - '%core.php_ext%'
 
     ecyaz.liveupdates.listener:
         class: ecyaz\liveupdates\event\main_listener
