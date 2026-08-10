@@ -73,18 +73,6 @@ Dates are read as UTC midnight, the way core's own user pruning reads them, so t
 | Run at most once every | 86400 s | |
 | Members per run | 25 | |
 
-## Testing
-
-The extension ships unit/database and functional tests. With the phpBB Docker harness:
-
-```
-./.phpbb-harness/harness sniff
-./.phpbb-harness/harness epv
-./.phpbb-harness/harness test
-```
-
-The database tests cover the selection rules against a seeded board, including the message that survives because one participant is still active, the undelivered copy that is never touched, custom folder counts, unread counters, attachment deletion, exempt groups, and batching.
-
 ## Licence
 
 GPL-2.0-only. See `license.txt`.
