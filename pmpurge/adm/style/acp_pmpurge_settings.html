@@ -1,0 +1,154 @@
+<!-- INCLUDE overall_header.html -->
+
+<a id="maincontent"></a>
+
+<h1>{{ lang('ACP_PMPURGE_SETTINGS') }}</h1>
+
+<p>{{ lang('PMPURGE_SETTINGS_EXPLAIN') }}</p>
+
+<!-- IF S_PMPURGE_RUNNING -->
+	<div class="successbox">
+		<h3>{{ lang('PMPURGE_RUNNING') }}</h3>
+		<p>{{ lang('PMPURGE_RUNNING_EXPLAIN', PMPURGE_RUN_USERS, PMPURGE_RUN_ROWS, PMPURGE_RUN_MESSAGES) }}</p>
+		<p><a href="{{ U_PMPURGE_CONTINUE }}">{{ lang('PMPURGE_CONTINUE') }}</a></p>
+	</div>
+<!-- ENDIF -->
+
+<!-- IF S_PMPURGE_PREVIEW -->
+	<fieldset>
+		<legend>{{ lang('PMPURGE_PREVIEW_RESULT') }}</legend>
+		<dl>
+			<dt><label>{{ lang('PMPURGE_PREVIEW_USERS') }}</label></dt>
+			<dd><strong id="pmpurge_preview_users">{{ PMPURGE_PREVIEW_USERS }}</strong> {{ lang('PMPURGE_MEMBERS') }}</dd>
+		</dl>
+		<dl>
+			<dt><label>{{ lang('PMPURGE_PREVIEW_ROWS') }}</label><br><span>{{ lang('PMPURGE_PREVIEW_ROWS_EXPLAIN') }}</span></dt>
+			<dd><strong id="pmpurge_preview_rows">{{ PMPURGE_PREVIEW_ROWS }}</strong></dd>
+		</dl>
+		<dl>
+			<dt><label>{{ lang('PMPURGE_PREVIEW_MSGS') }}</label><br><span>{{ lang('PMPURGE_PREVIEW_MSGS_EXPLAIN') }}</span></dt>
+			<dd><strong id="pmpurge_preview_msgs">{{ PMPURGE_PREVIEW_MSGS }}</strong></dd>
+		</dl>
+	</fieldset>
+<!-- ENDIF -->
+
+<form id="pmpurge_settings" method="post" action="{{ U_ACTION }}">
+
+<fieldset>
+	<legend>{{ lang('PMPURGE_SELECTION') }}</legend>
+
+	<p>{{ lang('PMPURGE_SELECTION_EXPLAIN') }}</p>
+
+	<dl>
+		<dt><label>{{ lang('PMPURGE_INACTIVE') }}</label><br><span>{{ lang('PMPURGE_INACTIVE_DAYS_EXPLAIN') }}</span></dt>
+		<dd>
+			<label><input type="radio" class="radio" name="pmpurge_inactive_mode" value="days"<!-- IF not S_PMPURGE_INACTIVE_BY_DATE --> checked<!-- ENDIF -->>
+				{{ lang('PMPURGE_INACTIVE_DAYS') }}</label>
+			<input id="pmpurge_inactive_days" type="number" min="1" name="pmpurge_inactive_days" value="{{ PMPURGE_INACTIVE_DAYS }}"> {{ lang('PMPURGE_DAYS') }}
+		</dd>
+		<dd>
+			<label><input type="radio" class="radio" name="pmpurge_inactive_mode" value="date"<!-- IF S_PMPURGE_INACTIVE_BY_DATE --> checked<!-- ENDIF -->>
+				{{ lang('PMPURGE_INACTIVE_BEFORE') }}</label>
+			<input id="pmpurge_inactive_before" type="date" name="pmpurge_inactive_before" value="{{ PMPURGE_INACTIVE_BEFORE }}" placeholder="{{ lang('PMPURGE_DATE_FORMAT') }}">
+		</dd>
+	</dl>
+
+	<dl>
+		<dt><label>{{ lang('PMPURGE_MSG_AGE') }}</label><br><span>{{ lang('PMPURGE_MSG_AGE_EXPLAIN') }}</span></dt>
+		<dd>
+			<label><input type="radio" class="radio" name="pmpurge_msg_mode" value="days"<!-- IF not S_PMPURGE_MSG_BY_DATE --> checked<!-- ENDIF -->>
+				{{ lang('PMPURGE_PM_AGE_DAYS') }}</label>
+			<input id="pmpurge_pm_age_days" type="number" min="0" name="pmpurge_pm_age_days" value="{{ PMPURGE_PM_AGE_DAYS }}"> {{ lang('PMPURGE_DAYS') }}
+		</dd>
+		<dd>
+			<label><input type="radio" class="radio" name="pmpurge_msg_mode" value="date"<!-- IF S_PMPURGE_MSG_BY_DATE --> checked<!-- ENDIF -->>
+				{{ lang('PMPURGE_MSG_BETWEEN') }}</label>
+			<input id="pmpurge_msg_after" type="date" name="pmpurge_msg_after" value="{{ PMPURGE_MSG_AFTER }}" placeholder="{{ lang('PMPURGE_DATE_FORMAT') }}">
+			{{ lang('PMPURGE_AND') }}
+			<input id="pmpurge_msg_before" type="date" name="pmpurge_msg_before" value="{{ PMPURGE_MSG_BEFORE }}" placeholder="{{ lang('PMPURGE_DATE_FORMAT') }}">
+		</dd>
+	</dl>
+
+	<dl>
+		<dt><label for="pmpurge_include_never_visited">{{ lang('PMPURGE_INCLUDE_NEVER') }}</label><br><span>{{ lang('PMPURGE_INCLUDE_NEVER_EXPLAIN') }}</span></dt>
+		<dd><label><input type="radio" class="radio" name="pmpurge_include_never_visited" value="1"<!-- IF PMPURGE_INCLUDE_NEVER --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+			<label><input type="radio" class="radio" name="pmpurge_include_never_visited" value="0"<!-- IF not PMPURGE_INCLUDE_NEVER --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
+	</dl>
+
+	<dl>
+		<dt><label for="pmpurge_skip_founders">{{ lang('PMPURGE_SKIP_FOUNDERS') }}</label></dt>
+		<dd><label><input type="radio" class="radio" name="pmpurge_skip_founders" value="1"<!-- IF PMPURGE_SKIP_FOUNDERS --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+			<label><input type="radio" class="radio" name="pmpurge_skip_founders" value="0"<!-- IF not PMPURGE_SKIP_FOUNDERS --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
+	</dl>
+
+	<dl>
+		<dt><label for="pmpurge_exempt_groups">{{ lang('PMPURGE_EXEMPT_GROUPS') }}</label><br><span>{{ lang('PMPURGE_EXEMPT_GROUPS_EXPLAIN') }}</span></dt>
+		<dd><input id="pmpurge_exempt_groups" type="text" name="pmpurge_exempt_groups" value="{{ PMPURGE_EXEMPT_GROUPS }}" size="40"></dd>
+	</dl>
+
+	<dl>
+		<dt><label for="pmpurge_include_outbox">{{ lang('PMPURGE_INCLUDE_OUTBOX') }}</label><br><span>{{ lang('PMPURGE_INCLUDE_OUTBOX_EXPLAIN') }}</span></dt>
+		<dd><label><input type="radio" class="radio" name="pmpurge_include_outbox" value="1"<!-- IF PMPURGE_INCLUDE_OUTBOX --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+			<label><input type="radio" class="radio" name="pmpurge_include_outbox" value="0"<!-- IF not PMPURGE_INCLUDE_OUTBOX --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
+	</dl>
+</fieldset>
+
+<fieldset>
+	<legend>{{ lang('PMPURGE_SCHEDULE') }}</legend>
+
+	<dl>
+		<dt><label for="pmpurge_enabled">{{ lang('PMPURGE_ENABLED') }}</label><br><span>{{ lang('PMPURGE_ENABLED_EXPLAIN') }}</span></dt>
+		<dd><label><input type="radio" class="radio" name="pmpurge_enabled" value="1"<!-- IF PMPURGE_ENABLED --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+			<label><input type="radio" class="radio" name="pmpurge_enabled" value="0"<!-- IF not PMPURGE_ENABLED --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
+	</dl>
+
+	<dl>
+		<dt><label for="pmpurge_dry_run">{{ lang('PMPURGE_DRY_RUN') }}</label><br><span>{{ lang('PMPURGE_DRY_RUN_EXPLAIN') }}</span></dt>
+		<dd><label><input type="radio" class="radio" name="pmpurge_dry_run" value="1"<!-- IF PMPURGE_DRY_RUN --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+			<label><input type="radio" class="radio" name="pmpurge_dry_run" value="0"<!-- IF not PMPURGE_DRY_RUN --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
+	</dl>
+
+	<dl>
+		<dt><label for="pmpurge_gc">{{ lang('PMPURGE_GC') }}</label><br><span>{{ lang('PMPURGE_GC_EXPLAIN') }}</span></dt>
+		<dd><input id="pmpurge_gc" type="number" min="60" name="pmpurge_gc" value="{{ PMPURGE_GC }}"> {{ lang('PMPURGE_SECONDS') }}</dd>
+	</dl>
+
+	<dl>
+		<dt><label for="pmpurge_batch_users">{{ lang('PMPURGE_BATCH_USERS') }}</label><br><span>{{ lang('PMPURGE_BATCH_USERS_EXPLAIN') }}</span></dt>
+		<dd><input id="pmpurge_batch_users" type="number" min="1" name="pmpurge_batch_users" value="{{ PMPURGE_BATCH_USERS }}"> {{ lang('PMPURGE_MEMBERS') }}</dd>
+	</dl>
+
+	<dl>
+		<dt><label>{{ lang('PMPURGE_LAST_GC') }}</label></dt>
+		<dd><strong>{{ PMPURGE_LAST_GC }}</strong></dd>
+	</dl>
+</fieldset>
+
+<fieldset class="submit-buttons">
+	<legend>{{ lang('SUBMIT') }}</legend>
+	<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}">
+	<input class="button2" type="reset" id="reset" name="reset" value="{{ lang('RESET') }}">
+	{{ S_FORM_TOKEN }}
+</fieldset>
+</form>
+
+<form id="pmpurge_run" method="post" action="{{ U_ACTION }}">
+<fieldset>
+	<legend>{{ lang('PMPURGE_RUN') }}</legend>
+
+	<p>{{ lang('PMPURGE_RUN_EXPLAIN') }}</p>
+
+	<dl>
+		<dt><label for="dry">{{ lang('PMPURGE_RUN_AS_DRY') }}</label></dt>
+		<dd><input id="dry" type="checkbox" class="checkbox" name="dry" value="1" checked></dd>
+	</dl>
+
+	<p class="submit-buttons">
+		<input class="button2" type="submit" id="preview" name="preview" value="{{ lang('PMPURGE_PREVIEW') }}">
+		<input class="button1" type="submit" id="purge_now" name="purge_now" value="{{ lang('PMPURGE_PURGE_NOW') }}">
+	</p>
+	{{ S_FORM_TOKEN }}
+</fieldset>
+</form>
+
+<!-- INCLUDE overall_footer.html -->

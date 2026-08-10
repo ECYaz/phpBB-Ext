@@ -1,0 +1,34 @@
+services:
+    ecyaz.pmpurge.purger:
+        class: ecyaz\pmpurge\purger
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@log'
+            - '@user'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    ecyaz.pmpurge.listener:
+        class: ecyaz\pmpurge\event\main_listener
+        tags:
+            - { name: event.listener }
+
+    ecyaz.pmpurge.cron.purge:
+        class: ecyaz\pmpurge\cron\task\purge_pms
+        arguments:
+            - '@config'
+            - '@ecyaz.pmpurge.purger'
+        calls:
+            - [set_name, [ecyaz.pmpurge.cron.purge]]
+        tags:
+            - { name: cron.task }
+
+    ecyaz.pmpurge.console.purge:
+        class: ecyaz\pmpurge\console\command\purge
+        arguments:
+            - '@user'
+            - '@language'
+            - '@ecyaz.pmpurge.purger'
+        tags:
+            - { name: console.command }

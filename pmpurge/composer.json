@@ -1,0 +1,20 @@
+{
+    "name": "ecyaz/pmpurge",
+    "type": "phpbb-extension",
+    "description": "Purge the private messages of long-inactive members, on a schedule or on demand, using phpBB's own deletion routines.",
+    "homepage": "https://github.com/ECYaz/phpBB-Extensions",
+    "version": "1.0.0",
+    "license": "GPL-2.0-only",
+    "authors": [
+        { "name": "ECYaz" }
+    ],
+    "require": {
+        "php": ">=7.2"
+    },
+    "extra": {
+        "display-name": "Old PMs Purger",
+        "soft-require": {
+            "phpbb/phpbb": ">=3.3.0,<4.0.0@dev"
+        }
+    }
+}
