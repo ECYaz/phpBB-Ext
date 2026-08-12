@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Sets email notifications for incoming private messages on or off by default, for new and existing users, from an ACP toggle.",
     "homepage": "https://github.com/ECYaz/phpBB-Ext",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "license": "GPL-2.0-only",
     "keywords": ["phpbb", "extension", "notifications", "private-messages", "email"],
     "authors": [

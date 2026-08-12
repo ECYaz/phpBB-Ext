@@ -1,4 +1,11 @@
 services:
+    ecyaz.pmemaildefault.helper:
+        class: ecyaz\pmemaildefault\helper\pm_email
+        arguments:
+            - '@dbal.conn'
+            - '%tables.users%'
+            - '%tables.user_notifications%'
+
     ecyaz.pmemaildefault.listener:
         class: ecyaz\pmemaildefault\event\main_listener
         arguments:
