@@ -1,15 +1,5 @@
-<style>
-	#postform input.fpp-disabled,
-	#postform input.fpp-disabled:hover,
-	#postform input.fpp-disabled:focus {
-		opacity: .5;
-		cursor: not-allowed;
-		filter: grayscale(100%);
-		box-shadow: none;
-	}
-</style>
+<!-- INCLUDECSS @ecyaz_forcepostpreview/forcepostpreview.css -->
 <script>
-// <![CDATA[
 (function () {
 	'use strict';
 
@@ -40,6 +30,7 @@
 		}
 
 		var message = document.getElementById('message');
+		var subject = form.querySelector('input[name="subject"]');
 
 		function lock() {
 			submit.disabled = true;
@@ -53,17 +44,37 @@
 			submit.removeAttribute('title');
 		}
 
+		// Editor insertions (BBCode toolbar, colour palette, smilies, inline
+		// attachment placement) write textarea.value through the core
+		// editor.js globals insert_text() / bbfontstyle() and fire no input
+		// event, so relocking needs the globals wrapped as well as the
+		// input listeners.
+		function wrap_global(name) {
+			var original = window[name];
+			if (typeof original !== 'function') {
+				return;
+			}
+			window[name] = function () {
+				lock();
+				return original.apply(this, arguments);
+			};
+		}
+
 		if (fpp.previewed) {
 			unlock();
-			// Editing the message after previewing requires a fresh preview,
-			// so the user always submits exactly what they previewed.
+			// Editing the message or subject after previewing requires a
+			// fresh preview, so the user always submits what they previewed.
 			if (message) {
 				message.addEventListener('input', lock);
 			}
+			if (subject) {
+				subject.addEventListener('input', lock);
+			}
+			wrap_global('insert_text');
+			wrap_global('bbfontstyle');
 		} else {
 			lock();
 		}
 	});
 })();
-// ]]>
 </script>

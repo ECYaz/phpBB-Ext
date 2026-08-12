@@ -1,0 +1,12 @@
+/* Force Post Preview — locked Submit button styling (full editor + quick reply) */
+#postform input.fpp-disabled,
+#postform input.fpp-disabled:hover,
+#postform input.fpp-disabled:focus,
+#qr_postform input.fpp-disabled,
+#qr_postform input.fpp-disabled:hover,
+#qr_postform input.fpp-disabled:focus {
+	opacity: .5;
+	cursor: not-allowed;
+	filter: grayscale(100%);
+	box-shadow: none;
+}

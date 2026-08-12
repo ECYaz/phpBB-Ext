@@ -2,8 +2,8 @@
     "name": "ecyaz/forcepostpreview",
     "type": "phpbb-extension",
     "description": "Requires users to preview a post before the Submit button becomes available.",
-    "homepage": "https://github.com/ECYaz/phpBB-Extensions",
-    "version": "1.1.0",
+    "homepage": "https://github.com/ECYaz/phpBB-Ext",
+    "version": "1.1.1",
     "license": "GPL-2.0-only",
     "authors": [
         { "name": "ECYaz" }
@@ -15,6 +15,12 @@
         "display-name": "Force Post Preview",
         "soft-require": {
             "phpbb/phpbb": ">=3.3.0,<4.0.0@dev"
+        },
+        "version-check": {
+            "host": "raw.githubusercontent.com",
+            "directory": "/ECYaz/phpBB-Ext/main/versioncheck",
+            "filename": "forcepostpreview.json",
+            "ssl": true
         }
     }
 }

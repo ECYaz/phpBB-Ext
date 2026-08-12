@@ -2,8 +2,10 @@
 
 A phpBB extension that keeps the **Submit** button greyed-out and unclickable on
 the posting screen until the user has **previewed** their post. After a preview,
-Submit becomes available; if the post is edited again, a fresh preview is
-required. The **Preview** and **Save draft** buttons always stay usable.
+Submit becomes available; editing the post again — typing in the message or
+subject, or inserting BBCode, colours, smilies, or inline attachments from the
+editor controls — locks it again until a fresh preview. The **Preview** and
+**Save draft** buttons always stay usable.
 
 Works on the full posting editor — new topic, reply, quote, edit, and private
 message compose.
@@ -21,17 +23,13 @@ preview gate above applies.
 
 ## Download & install
 
-**Easiest — use the zip:** download
-[`forcePostPreview.zip`](https://github.com/ECYaz/phpBB-Ext/raw/main/forcePostPreview.zip) (in the repository root) and
-extract it into your board's `ext/` directory. It unpacks to
-`ext/ecyaz/forcepostpreview/`.
-
-**From source instead:** copy the files in this folder into
-`ext/ecyaz/forcepostpreview/` on your board. The path must be exactly
-`ext/ecyaz/forcepostpreview/` — phpBB derives the extension's namespace from it.
-
-Then enable it via *ACP → Customise → Extensions → Force Post Preview*. After
-enabling (or any change), purge the cache via *ACP → General → Purge the cache*.
+1. Download [`forcepostpreview.zip`](https://github.com/ECYaz/phpBB-Ext/raw/main/forcepostpreview.zip)
+   and unzip it into your board's `ext/` directory (it unpacks to
+   `ext/ecyaz/forcepostpreview/`), or copy this folder to
+   `ext/ecyaz/forcepostpreview/`.
+2. Enable it via *ACP → Customise → Extensions → Force Post Preview*.
+3. After enabling (or any change), purge the cache via *ACP → General → Purge
+   the cache*.
 
 ## License
 
