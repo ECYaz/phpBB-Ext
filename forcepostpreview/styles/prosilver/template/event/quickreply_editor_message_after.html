@@ -1,36 +1,7 @@
+{# Quick reply has no inline preview: the only way to preview is the
+   "Full Editor & Preview" button (name="preview"), which carries the draft
+   into the full posting editor where the preview gate applies. So the
+   previewed flag is always 0 here and only the direct Submit button locks. #}
 <!-- INCLUDECSS @ecyaz_forcepostpreview/forcepostpreview.css -->
-<script>
-(function () {
-	'use strict';
-
-	var message = '{LA_FPP_PREVIEW_REQUIRED_QR}';
-
-	function ready(fn) {
-		if (document.readyState !== 'loading') {
-			fn();
-		} else {
-			document.addEventListener('DOMContentLoaded', fn);
-		}
-	}
-
-	ready(function () {
-		var form = document.getElementById('qr_postform');
-		if (!form) {
-			return;
-		}
-
-		// Quick reply has no inline preview: the only way to preview is the
-		// "Full Editor & Preview" button (name="preview"), which carries the
-		// draft into the full posting editor where the preview gate applies.
-		// So we keep that button usable and lock only the direct Submit button.
-		var submit = form.querySelector('input[name="post"]');
-		if (!submit) {
-			return;
-		}
-
-		submit.disabled = true;
-		submit.className += submit.className.indexOf('fpp-disabled') === -1 ? ' fpp-disabled' : '';
-		submit.setAttribute('title', message);
-	});
-})();
-</script>
+<!-- INCLUDEJS @ecyaz_forcepostpreview/forcepostpreview.js -->
+<span id="fpp-data" hidden data-fpp-form="qr_postform" data-fpp-previewed="0" data-fpp-message="{{ lang('FPP_PREVIEW_REQUIRED_QR')|e('html_attr') }}"></span>
