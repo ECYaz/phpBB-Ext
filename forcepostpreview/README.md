@@ -1,25 +1,25 @@
-# Force Post Preview — phpBB 3.3.x
+# Force Post Preview for phpBB 3.3.x
 
-A phpBB extension that keeps the **Submit** button greyed-out and unclickable on
+A phpBB extension that keeps the **Submit** button greyed out and unclickable on
 the posting screen until the user has **previewed** their post. After a preview,
-Submit becomes available; editing the post again — typing in the message or
-subject, or inserting BBCode, colours, smilies, or inline attachments from the
-editor controls — locks it again until a fresh preview. The **Preview** and
-**Save draft** buttons always stay usable.
+Submit becomes available. Editing the post again locks it until a fresh preview,
+whether that edit is typing in the message or subject, or inserting BBCode,
+colours, smilies, or inline attachments from the editor controls. The
+**Preview** and **Save draft** buttons always stay usable.
 
-Works on the full posting editor — new topic, reply, quote, edit, and private
+Works on the full posting editor: new topic, reply, quote, edit, and private
 message compose.
 
-**Quick reply is covered too.** Because the quick-reply box has no inline
+**Quick reply is covered too.** Because the quick reply box has no inline
 preview, its **Submit** button is locked and the **Full Editor & Preview**
-button stays enabled — so the only way forward is the full editor, where the
+button stays enabled, so the only way forward is the full editor, where the
 preview gate above applies.
 
-> **Note:** this is a client-side UI gate. A user with browser dev tools, or with
-> JavaScript disabled, can still submit without previewing — phpBB has no reliable
-> way to enforce "was previewed" server-side, since a preview is a separate,
-> stateless request. This extension nudges the normal posting flow; it is not a
-> security control.
+> **Note:** this is a UI gate in the browser. A user with browser dev tools, or
+> with JavaScript disabled, can still submit without previewing. phpBB has no
+> reliable way to enforce "was previewed" on the server, since a preview is a
+> separate, stateless request. This extension nudges the normal posting flow; it
+> is not a security control.
 
 ## Download & install
 
@@ -33,4 +33,4 @@ preview gate above applies.
 
 ## License
 
-GPL-2.0-only (see `license.txt`).
+GPL 2.0 only (see `license.txt`).
