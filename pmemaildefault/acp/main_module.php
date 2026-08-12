@@ -1,4 +1,13 @@
 <?php
+/**
+ *
+ * PM Email Default. An extension for the phpBB Forum Software package.
+ *
+ * @copyright (c) 2026 ECYaz
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ *
+ */
+
 namespace ecyaz\pmemaildefault\acp;
 
 class main_module
@@ -108,6 +117,14 @@ class main_module
 				'method'	=> $method,
 				'notify'	=> $notify,
 			];
+
+			// Flush in batches so neither the PHP array nor the INSERT statement
+			// grows unbounded on a very large board.
+			if (count($rows) >= 500)
+			{
+				$db->sql_multi_insert($notif_tbl, $rows);
+				$rows = [];
+			}
 		}
 		$db->sql_freeresult($result);
 

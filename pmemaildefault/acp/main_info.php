@@ -1,4 +1,13 @@
 <?php
+/**
+ *
+ * PM Email Default. An extension for the phpBB Forum Software package.
+ *
+ * @copyright (c) 2026 ECYaz
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ *
+ */
+
 namespace ecyaz\pmemaildefault\acp;
 
 class main_info
@@ -11,7 +20,7 @@ class main_info
 			'modes'		=> [
 				'settings'	=> [
 					'title'	=> 'ACP_PMEMAILDEFAULT_SETTINGS',
-					'auth'	=> 'acl_a_board',
+					'auth'	=> 'ext_ecyaz/pmemaildefault && acl_a_board',
 					'cat'	=> ['ACP_CAT_DOT_MODS'],
 				],
 			],

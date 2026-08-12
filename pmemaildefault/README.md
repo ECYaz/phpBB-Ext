@@ -15,7 +15,7 @@ Out of the box, phpBB only enables the in-board (notification list) method for n
 ## Requirements
 
 - phpBB 3.3.x
-- PHP 7.2 or newer
+- PHP 7.1.3 or newer
 
 ## Installation
 
@@ -76,4 +76,4 @@ removes the ACP settings page and the stored toggle value).
 
 ## Author
 
-ECYaz — <https://github.com/ECYaz/phpBB-Extensions>
+ECYaz — <https://github.com/ECYaz>

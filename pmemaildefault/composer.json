@@ -2,8 +2,8 @@
     "name": "ecyaz/pmemaildefault",
     "type": "phpbb-extension",
     "description": "Sets email notifications for incoming private messages on or off by default, for new and existing users, from an ACP toggle.",
-    "homepage": "https://github.com/ECYaz/phpBB-Extensions",
-    "version": "1.0.2",
+    "homepage": "https://github.com/ECYaz/phpBB-Ext",
+    "version": "1.0.3",
     "license": "GPL-2.0-only",
     "keywords": ["phpbb", "extension", "notifications", "private-messages", "email"],
     "authors": [
@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2"
+        "php": ">=7.1.3"
     },
     "require-dev": {
         "phpbb/epv": "dev-master"
@@ -23,6 +23,12 @@
         "display-name": "PM Email Default",
         "soft-require": {
             "phpbb/phpbb": ">=3.3.0,<4.0.0@dev"
+        },
+        "version-check": {
+            "host": "www.phpbb.com",
+            "directory": "/customise/db/extension/pm_email_default/",
+            "filename": "version_check",
+            "ssl": true
         }
     }
 }
