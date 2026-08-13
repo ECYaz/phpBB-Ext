@@ -44,7 +44,6 @@ $lang = array_merge($lang ?? [], [
 	'PMPURGE_PM_AGE_DAYS'                 => 'older than',
 	'PMPURGE_MSG_BETWEEN'                 => 'or sent between',
 	'PMPURGE_AND'                         => 'and',
-	'PMPURGE_DATE_FORMAT'                 => 'YYYY-MM-DD',
 	'PMPURGE_DATE_INVALID'                => 'The date “%s” is not a valid YYYY-MM-DD date.',
 	'PMPURGE_DATE_REQUIRED'               => 'Enter a date to purge the messages of members who last visited before it, or switch back to a rolling number of days.',
 	'PMPURGE_DATE_RANGE_INVALID'          => 'The start of the message date range must fall before its end.',
@@ -57,7 +56,7 @@ $lang = array_merge($lang ?? [], [
 	'PMPURGE_INCLUDE_OUTBOX_EXPLAIN'      => 'The outbox holds sent messages nobody has read yet. phpBB blanks the text of such a message when its sender deletes it, so switching this on can empty a message that an active member still has waiting. Off is the safe choice.',
 
 	'PMPURGE_RUN'                => 'Run now',
-	'PMPURGE_RUN_EXPLAIN'        => 'Preview counts what the settings above select and changes nothing. Purge now works through the whole member list in batches; on a large board prefer the command line, which has no request timeout over it: <samp>php bin/phpbbcli.php pmpurge:run --all</samp>',
+	'PMPURGE_RUN_EXPLAIN'        => 'Preview counts what the settings above select and changes nothing. Purge now works through the whole member list in batches; on a large board prefer the command line, which has no request timeout over it: <samp>php bin/phpbbcli.php ecyaz:pmpurge:run --all</samp>',
 	'PMPURGE_PREVIEW'            => 'Preview',
 	'PMPURGE_PURGE_NOW'          => 'Purge now',
 	'PMPURGE_RUN_AS_DRY'         => 'Report only, delete nothing',

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.1
+
+Addresses the informational notes from the phpBB.com validation of 1.0.0.
+
+* Console runs are now written to the admin log, one entry with the run's totals, the same way a manual run from the ACP is. The documentation promised this and the ACP and cron paths already did it.
+* The console command is now `ecyaz:pmpurge:run` (was `pmpurge:run`), carrying the vendor prefix so no other extension can collide with it.
+* The yes/no radio pairs and the automatic purge setting in the ACP form now carry the ids their labels point at, so clicking a label focuses its control. Removed the `placeholder` attribute from the three date fields, which browsers ignore on inputs of type date.
+* license.txt now carries the Free Software Foundation's current Franklin Street address in the GPL 2.0 header.
+
 ## 1.0.0
 
 First release.

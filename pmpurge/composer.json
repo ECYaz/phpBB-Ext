@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Purge the private messages of long inactive members, on a schedule or on demand, using phpBB's own deletion routines.",
     "homepage": "https://github.com/ECYaz/phpBB-Ext",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "license": "GPL-2.0-only",
     "authors": [
         { "name": "ECYaz" }

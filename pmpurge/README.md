@@ -60,8 +60,8 @@ deliberate: look at a Preview before you let it delete anything.
   request timeout over it:
 
 ```
-php bin/phpbbcli.php pmpurge:run --dry-run --all
-php bin/phpbbcli.php pmpurge:run --all
+php bin/phpbbcli.php ecyaz:pmpurge:run --dry-run --all
+php bin/phpbbcli.php ecyaz:pmpurge:run --all
 ```
 
 `--limit=N` overrides the members per batch setting for one run.

@@ -49,7 +49,7 @@ class purge extends \phpbb\console\command\command
 	protected function configure()
 	{
 		$this
-			->setName('pmpurge:run')
+			->setName('ecyaz:pmpurge:run')
 			->setDescription($this->language->lang('CLI_DESCRIPTION_PMPURGE_RUN'))
 			->addOption('dry-run', null, InputOption::VALUE_NONE, $this->language->lang('CLI_DESCRIPTION_PMPURGE_DRY_RUN'))
 			->addOption('all', 'a', InputOption::VALUE_NONE, $this->language->lang('CLI_DESCRIPTION_PMPURGE_ALL'))
@@ -102,6 +102,11 @@ class purge extends \phpbb\console\command\command
 			}
 		}
 		while ($all && !$stats['finished']);
+
+		// One entry for the whole run, totals included, exactly like a manual
+		// run from the ACP: the loop passes $log_run = false to purge() so a
+		// --all walk cannot flood the admin log batch by batch.
+		$this->purger->log_run($dry_run, $totals);
 
 		if ($dry_run)
 		{

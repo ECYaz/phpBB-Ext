@@ -283,14 +283,30 @@ class purger
 
 		if ($log_run && $stats['users'])
 		{
-			$this->log->add('admin', (int) $this->user->data['user_id'], $this->user->ip, $dry_run ? 'LOG_PMPURGE_DRY_RUN' : 'LOG_PMPURGE_RUN', time(), [
-				$stats['users'],
-				$stats['rows'],
-				$stats['messages'],
-			]);
+			$this->log_run($dry_run, $stats);
 		}
 
 		return $stats;
+	}
+
+	/**
+	 * Write one admin log entry recording a run.
+	 *
+	 * Callers that loop over purge() batches (the ACP runner, the console
+	 * command) pass $log_run = false to purge() and call this once with their
+	 * totals, so a whole run lands in the log as a single entry.
+	 *
+	 * @param bool  $dry_run Whether the run deleted anything
+	 * @param array $stats   Totals to record: keys users, rows and messages
+	 * @return void
+	 */
+	public function log_run($dry_run, array $stats)
+	{
+		$this->log->add('admin', (int) $this->user->data['user_id'], $this->user->ip, $dry_run ? 'LOG_PMPURGE_DRY_RUN' : 'LOG_PMPURGE_RUN', time(), [
+			$stats['users'],
+			$stats['rows'],
+			$stats['messages'],
+		]);
 	}
 
 	/**

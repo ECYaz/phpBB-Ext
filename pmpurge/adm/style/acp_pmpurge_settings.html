@@ -49,7 +49,7 @@
 		<dd>
 			<label><input type="radio" class="radio" name="pmpurge_inactive_mode" value="date"<!-- IF S_PMPURGE_INACTIVE_BY_DATE --> checked<!-- ENDIF -->>
 				{{ lang('PMPURGE_INACTIVE_BEFORE') }}</label>
-			<input id="pmpurge_inactive_before" type="date" name="pmpurge_inactive_before" value="{{ PMPURGE_INACTIVE_BEFORE }}" placeholder="{{ lang('PMPURGE_DATE_FORMAT') }}">
+			<input id="pmpurge_inactive_before" type="date" name="pmpurge_inactive_before" value="{{ PMPURGE_INACTIVE_BEFORE }}">
 		</dd>
 	</dl>
 
@@ -63,21 +63,21 @@
 		<dd>
 			<label><input type="radio" class="radio" name="pmpurge_msg_mode" value="date"<!-- IF S_PMPURGE_MSG_BY_DATE --> checked<!-- ENDIF -->>
 				{{ lang('PMPURGE_MSG_BETWEEN') }}</label>
-			<input id="pmpurge_msg_after" type="date" name="pmpurge_msg_after" value="{{ PMPURGE_MSG_AFTER }}" placeholder="{{ lang('PMPURGE_DATE_FORMAT') }}">
+			<input id="pmpurge_msg_after" type="date" name="pmpurge_msg_after" value="{{ PMPURGE_MSG_AFTER }}">
 			{{ lang('PMPURGE_AND') }}
-			<input id="pmpurge_msg_before" type="date" name="pmpurge_msg_before" value="{{ PMPURGE_MSG_BEFORE }}" placeholder="{{ lang('PMPURGE_DATE_FORMAT') }}">
+			<input id="pmpurge_msg_before" type="date" name="pmpurge_msg_before" value="{{ PMPURGE_MSG_BEFORE }}">
 		</dd>
 	</dl>
 
 	<dl>
 		<dt><label for="pmpurge_include_never_visited">{{ lang('PMPURGE_INCLUDE_NEVER') }}</label><br><span>{{ lang('PMPURGE_INCLUDE_NEVER_EXPLAIN') }}</span></dt>
-		<dd><label><input type="radio" class="radio" name="pmpurge_include_never_visited" value="1"<!-- IF PMPURGE_INCLUDE_NEVER --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+		<dd><label><input type="radio" class="radio" id="pmpurge_include_never_visited" name="pmpurge_include_never_visited" value="1"<!-- IF PMPURGE_INCLUDE_NEVER --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
 			<label><input type="radio" class="radio" name="pmpurge_include_never_visited" value="0"<!-- IF not PMPURGE_INCLUDE_NEVER --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
 	</dl>
 
 	<dl>
 		<dt><label for="pmpurge_skip_founders">{{ lang('PMPURGE_SKIP_FOUNDERS') }}</label></dt>
-		<dd><label><input type="radio" class="radio" name="pmpurge_skip_founders" value="1"<!-- IF PMPURGE_SKIP_FOUNDERS --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+		<dd><label><input type="radio" class="radio" id="pmpurge_skip_founders" name="pmpurge_skip_founders" value="1"<!-- IF PMPURGE_SKIP_FOUNDERS --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
 			<label><input type="radio" class="radio" name="pmpurge_skip_founders" value="0"<!-- IF not PMPURGE_SKIP_FOUNDERS --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
 	</dl>
 
@@ -88,7 +88,7 @@
 
 	<dl>
 		<dt><label for="pmpurge_include_outbox">{{ lang('PMPURGE_INCLUDE_OUTBOX') }}</label><br><span>{{ lang('PMPURGE_INCLUDE_OUTBOX_EXPLAIN') }}</span></dt>
-		<dd><label><input type="radio" class="radio" name="pmpurge_include_outbox" value="1"<!-- IF PMPURGE_INCLUDE_OUTBOX --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+		<dd><label><input type="radio" class="radio" id="pmpurge_include_outbox" name="pmpurge_include_outbox" value="1"<!-- IF PMPURGE_INCLUDE_OUTBOX --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
 			<label><input type="radio" class="radio" name="pmpurge_include_outbox" value="0"<!-- IF not PMPURGE_INCLUDE_OUTBOX --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
 	</dl>
 </fieldset>
@@ -98,13 +98,13 @@
 
 	<dl>
 		<dt><label for="pmpurge_enabled">{{ lang('PMPURGE_ENABLED') }}</label><br><span>{{ lang('PMPURGE_ENABLED_EXPLAIN') }}</span></dt>
-		<dd><label><input type="radio" class="radio" name="pmpurge_enabled" value="1"<!-- IF PMPURGE_ENABLED --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+		<dd><label><input type="radio" class="radio" id="pmpurge_enabled" name="pmpurge_enabled" value="1"<!-- IF PMPURGE_ENABLED --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
 			<label><input type="radio" class="radio" name="pmpurge_enabled" value="0"<!-- IF not PMPURGE_ENABLED --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
 	</dl>
 
 	<dl>
 		<dt><label for="pmpurge_dry_run">{{ lang('PMPURGE_DRY_RUN') }}</label><br><span>{{ lang('PMPURGE_DRY_RUN_EXPLAIN') }}</span></dt>
-		<dd><label><input type="radio" class="radio" name="pmpurge_dry_run" value="1"<!-- IF PMPURGE_DRY_RUN --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
+		<dd><label><input type="radio" class="radio" id="pmpurge_dry_run" name="pmpurge_dry_run" value="1"<!-- IF PMPURGE_DRY_RUN --> checked<!-- ENDIF -->> {{ lang('YES') }}</label>
 			<label><input type="radio" class="radio" name="pmpurge_dry_run" value="0"<!-- IF not PMPURGE_DRY_RUN --> checked<!-- ENDIF -->> {{ lang('NO') }}</label></dd>
 	</dl>
 

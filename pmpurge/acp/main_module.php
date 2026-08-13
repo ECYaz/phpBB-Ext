@@ -335,30 +335,12 @@ class main_module
 			return;
 		}
 
-		$this->log_run($dry_run, $totals);
+		$purger->log_run($dry_run, $totals);
 
 		$message = $dry_run
 			? $language->lang('PMPURGE_DRY_RUN_DONE') . ' ' . $language->lang('PMPURGE_DRY_RUN_TOTALS', $totals['users'], $totals['rows'])
 			: $language->lang('PMPURGE_RUN_DONE') . ' ' . $language->lang('PMPURGE_RUN_TOTALS', $totals['users'], $totals['rows'], $totals['messages']);
 
 		trigger_error($message . adm_back_link($this->u_action));
-	}
-
-	/**
-	 * Write one admin log entry covering a whole manual run.
-	 *
-	 * @param bool  $dry_run Whether the run deleted anything
-	 * @param array $totals  Totals to record
-	 * @return void
-	 */
-	protected function log_run($dry_run, array $totals)
-	{
-		global $phpbb_log, $user;
-
-		$phpbb_log->add('admin', (int) $user->data['user_id'], $user->ip, $dry_run ? 'LOG_PMPURGE_DRY_RUN' : 'LOG_PMPURGE_RUN', time(), [
-			$totals['users'],
-			$totals['rows'],
-			$totals['messages'],
-		]);
 	}
 }
