@@ -108,11 +108,13 @@ class main_listener implements EventSubscriberInterface
 		$like_topic = $this->db->sql_like_expression($this->db->get_any_char() . 't=' . $topic_id . $this->db->get_any_char());
 		$like_post = $this->db->sql_like_expression($this->db->get_any_char() . 'p=' . $this->db->get_any_char());
 
+		$sql_where = 's.session_user_id = u.user_id
+				AND s.session_time >= ' . (int) $time . '
+				AND (s.session_page ' . $like_topic . ' OR s.session_page ' . $like_post . ')';
+
 		$sql = 'SELECT s.session_user_id, s.session_page, s.session_viewonline, u.username, u.user_colour
 			FROM ' . SESSIONS_TABLE . ' s, ' . USERS_TABLE . ' u
-			WHERE s.session_user_id = u.user_id
-				AND s.session_time >= ' . (int) $time . '
-				AND (s.session_page ' . $like_topic . ' OR s.session_page ' . $like_post . ')
+			WHERE ' . $sql_where . '
 			ORDER BY u.username_clean ASC';
 		$result = $this->db->sql_query($sql);
 
