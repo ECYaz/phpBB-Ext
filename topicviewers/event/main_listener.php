@@ -100,23 +100,38 @@ class main_listener implements EventSubscriberInterface
 		$time = time() - (($online_time ?: 5) * 60);
 		$time = $time - ($time % 60);
 
-		// Coarse filter on the stored page; the exact topic id is verified in PHP below
+		// Coarse filter on the stored page; the exact match is verified in PHP below
 		// because session_page can contain look-alikes such as "start=<topic_id>".
-		$like = $this->db->sql_like_expression($this->db->get_any_char() . 't=' . $topic_id . $this->db->get_any_char());
+		// The p= pattern catches viewers who arrived through a post permalink
+		// (unread/last-post/search links), whose tracked page carries the post id
+		// instead of the topic id; those post ids are resolved to the topic afterwards.
+		$like_topic = $this->db->sql_like_expression($this->db->get_any_char() . 't=' . $topic_id . $this->db->get_any_char());
+		$like_post = $this->db->sql_like_expression($this->db->get_any_char() . 'p=' . $this->db->get_any_char());
 
 		$sql = 'SELECT s.session_user_id, s.session_page, s.session_viewonline, u.username, u.user_colour
 			FROM ' . SESSIONS_TABLE . ' s, ' . USERS_TABLE . ' u
 			WHERE s.session_user_id = u.user_id
 				AND s.session_time >= ' . (int) $time . '
-				AND s.session_page ' . $like . ' ORDER BY u.username_clean ASC';
+				AND (s.session_page ' . $like_topic . ' OR s.session_page ' . $like_post . ')
+			ORDER BY u.username_clean ASC';
 		$result = $this->db->sql_query($sql);
+
+		$rows = [];
+
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			$rows[] = $row;
+		}
+		$this->db->sql_freeresult($result);
+
+		$topic_post_ids = $this->get_topic_post_ids($rows, $topic_id);
 
 		$guest_count = 0;
 		$members = [];
 
-		while ($row = $this->db->sql_fetchrow($result))
+		foreach ($rows as $row)
 		{
-			if (!$this->page_matches_topic($row['session_page'], $topic_id))
+			if (!$this->page_matches_topic($row['session_page'], $topic_id, $topic_post_ids))
 			{
 				continue;
 			}
@@ -139,7 +154,6 @@ class main_listener implements EventSubscriberInterface
 				'colour'	=> $row['user_colour'],
 			];
 		}
-		$this->db->sql_freeresult($result);
 
 		$reg_count = count($members);
 
@@ -167,24 +181,92 @@ class main_listener implements EventSubscriberInterface
 	 * Verify that a stored session_page is actually viewing the given topic.
 	 *
 	 * Parses the query string so that "t=<id>" matches exactly and look-alikes
-	 * such as "start=<id>" do not. Handles both raw and HTML-encoded ampersands.
+	 * such as "start=<id>" do not. Pages carrying only a post id ("p=<id>")
+	 * match when that post id belongs to the topic.
 	 *
 	 * @param string	$session_page	The session_page value from the sessions table
 	 * @param int		$topic_id		The topic id to match against
+	 * @param array		$topic_post_ids	Post ids known to belong to the topic
 	 * @return bool		True if the page is viewing this topic
 	 */
-	protected function page_matches_topic($session_page, $topic_id)
+	protected function page_matches_topic($session_page, $topic_id, array $topic_post_ids)
+	{
+		$params = $this->get_page_params($session_page);
+
+		if (isset($params['t']))
+		{
+			return (int) $params['t'] === (int) $topic_id;
+		}
+
+		return isset($params['p']) && in_array((int) $params['p'], $topic_post_ids, true);
+	}
+
+	/**
+	 * Resolve which of the post ids seen in the candidate sessions belong to the topic.
+	 *
+	 * Sessions whose page has no "t=" parameter may still be viewing the topic via a
+	 * post permalink ("p=<post id>"). One query maps those post ids to the topic.
+	 *
+	 * @param array	$rows		Session rows fetched for the coarse filter
+	 * @param int	$topic_id	The topic id to match against
+	 * @return array	Post ids (int) confirmed to belong to the topic
+	 */
+	protected function get_topic_post_ids(array $rows, $topic_id)
+	{
+		$post_ids = [];
+
+		foreach ($rows as $row)
+		{
+			$params = $this->get_page_params($row['session_page']);
+
+			if (!isset($params['t']) && isset($params['p']) && (int) $params['p'] > 0)
+			{
+				$post_ids[(int) $params['p']] = true;
+			}
+		}
+
+		if (!$post_ids)
+		{
+			return [];
+		}
+
+		$topic_post_ids = [];
+
+		$sql = 'SELECT post_id
+			FROM ' . POSTS_TABLE . '
+			WHERE ' . $this->db->sql_in_set('post_id', array_keys($post_ids)) . '
+				AND topic_id = ' . (int) $topic_id;
+		$result = $this->db->sql_query($sql);
+
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			$topic_post_ids[] = (int) $row['post_id'];
+		}
+		$this->db->sql_freeresult($result);
+
+		return $topic_post_ids;
+	}
+
+	/**
+	 * Parse the query-string parameters out of a stored session_page value.
+	 *
+	 * Handles both raw and HTML-encoded ampersands.
+	 *
+	 * @param string	$session_page	The session_page value from the sessions table
+	 * @return array	Parameter name => value pairs (empty if the page has no query string)
+	 */
+	protected function get_page_params($session_page)
 	{
 		$query_pos = strpos($session_page, '?');
 
 		if ($query_pos === false)
 		{
-			return false;
+			return [];
 		}
 
 		$query = html_entity_decode(substr($session_page, $query_pos + 1), ENT_QUOTES);
 		parse_str($query, $params);
 
-		return isset($params['t']) && (int) $params['t'] === (int) $topic_id;
+		return $params;
 	}
 }

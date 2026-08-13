@@ -44,7 +44,7 @@ class main_module
 		{
 			if (!check_form_key($form_key))
 			{
-				trigger_error('FORM_INVALID', E_USER_ERROR);
+				trigger_error($user->lang('FORM_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 
 			$config->set('topicviewers_enable', $request->variable('topicviewers_enable', 0));

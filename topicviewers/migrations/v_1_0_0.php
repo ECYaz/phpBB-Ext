@@ -27,7 +27,6 @@ class v_1_0_0 extends \phpbb\db\migration\migration
 		return [
 			['config.add', ['topicviewers_enable', 1]],
 			['config.add', ['topicviewers_show_names', 0]],
-			['config.add', ['topicviewers_version', '1.0.0']],
 
 			// Own category under the Extensions tab → renders as the sidebar section
 			// header (depth 1). phpBB only draws a left-hand menu block for a tab when
@@ -68,7 +67,6 @@ class v_1_0_0 extends \phpbb\db\migration\migration
 			]],
 			['config.remove', ['topicviewers_enable']],
 			['config.remove', ['topicviewers_show_names']],
-			['config.remove', ['topicviewers_version']],
 		];
 	}
 }

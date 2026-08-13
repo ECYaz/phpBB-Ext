@@ -2,19 +2,25 @@
     "name": "ecyaz/topicviewers",
     "type": "phpbb-extension",
     "description": "Shows how many registered users and guests are currently viewing each topic.",
-    "homepage": "https://github.com/ECYaz/phpBB-Extensions",
+    "homepage": "https://github.com/ECYaz/phpBB-Ext",
     "version": "1.0.0",
     "license": "GPL-2.0-only",
     "authors": [
         { "name": "ECYaz" }
     ],
     "require": {
-        "php": ">=7.2"
+        "php": ">=7.1.3"
     },
     "extra": {
         "display-name": "Topic Viewers",
         "soft-require": {
             "phpbb/phpbb": ">=3.3.0,<4.0.0@dev"
+        },
+        "version-check": {
+            "host": "www.phpbb.com",
+            "directory": "/customise/db/extension/topic_viewers/",
+            "filename": "version_check",
+            "ssl": true
         }
     }
 }
