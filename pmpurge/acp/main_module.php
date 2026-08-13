@@ -135,7 +135,7 @@ class main_module
 
 		// Selection settings changed, so a walk in progress no longer means
 		// what it did when it started.
-		$config->set('ecyaz_pmpurge_cursor', 0);
+		$config->set('ecyaz_pmpurge_cursor', 0, false);
 
 		$phpbb_log->add('admin', (int) $user->data['user_id'], $user->ip, 'LOG_PMPURGE_SETTINGS', time());
 
@@ -259,8 +259,10 @@ class main_module
 		{
 			// The confirmation repost carries confirm_box's own session bound
 			// token rather than this form's key, so the key is checked here,
-			// on the way in, and not again on the way back.
-			if (!check_form_key($form_key))
+			// on the way in, and not again on the way back. A "No" answer also
+			// lands here without the key; confirm_box(false) ignores that
+			// repost, so it simply falls through to the settings page.
+			if (!$request->is_set_post('cancel') && !check_form_key($form_key))
 			{
 				trigger_error($language->lang('FORM_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
@@ -278,6 +280,15 @@ class main_module
 			trigger_error($language->lang('PMPURGE_NOT_CONFIGURED') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
 
+		// A fresh run covers the member list exactly once: from the top, with
+		// the wraparound off, so that candidates the batches never remove (a
+		// dry run removes none, exempt members are never removed) cannot feed
+		// the walk full batches forever.
+		if (!$continued)
+		{
+			$purger->restart();
+		}
+
 		$totals = [
 			'users'    => max(0, $request->variable('done_users', 0)),
 			'rows'     => max(0, $request->variable('done_rows', 0)),
@@ -289,7 +300,7 @@ class main_module
 
 		do
 		{
-			$stats = $purger->purge(0, $dry_run, false);
+			$stats = $purger->purge(0, $dry_run, false, false);
 
 			foreach (array_keys($totals) as $key)
 			{

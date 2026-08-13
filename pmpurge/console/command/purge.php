@@ -73,24 +73,35 @@ class purge extends \phpbb\console\command\command
 
 		$dry_run = (bool) $input->getOption('dry-run') || $this->purger->is_dry_run();
 		$limit   = (int) $input->getOption('limit');
+		$all     = (bool) $input->getOption('all');
+
+		// A --all run covers the member list exactly once: from the top, with
+		// the wraparound off, so candidates the batches never remove (dry runs
+		// remove none, exempt members are never removed) cannot feed the walk
+		// full batches forever. A single-batch run keeps the cron's wrapping
+		// cursor walk instead.
+		if ($all)
+		{
+			$this->purger->restart();
+		}
 
 		$totals = ['users' => 0, 'rows' => 0, 'messages' => 0];
 
 		do
 		{
-			$stats = $this->purger->purge($limit, $dry_run, false);
+			$stats = $this->purger->purge($limit, $dry_run, false, !$all);
 
 			foreach (array_keys($totals) as $key)
 			{
 				$totals[$key] += $stats[$key];
 			}
 
-			if ($input->getOption('all') && !$stats['finished'])
+			if ($all && !$stats['finished'])
 			{
 				$io->writeln($this->language->lang('CLI_PMPURGE_PROGRESS', $totals['users'], $totals['rows']), OutputInterface::VERBOSITY_VERBOSE);
 			}
 		}
-		while ($input->getOption('all') && !$stats['finished']);
+		while ($all && !$stats['finished']);
 
 		if ($dry_run)
 		{

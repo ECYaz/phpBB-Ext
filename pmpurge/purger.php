@@ -183,12 +183,20 @@ class purger
 	 * batch cannot act on (an exempt one, say) still moves the cursor along and
 	 * the next run makes progress instead of retrying the same window forever.
 	 *
+	 * With $wrap on, reaching the end of the member list restarts the walk from
+	 * the beginning inside the same call, which suits the cron's endless slow
+	 * lap. A caller looping until `finished` must pass $wrap = false (after
+	 * restart()), because candidates the batch never removes, such as exempt
+	 * members or everything during a dry run, would otherwise keep the wrapped
+	 * walk supplied with full batches forever and `finished` would never come.
+	 *
 	 * @param int  $max_users Members to process, 0 for the configured batch size
 	 * @param bool $dry_run   Override the configured dry run setting
 	 * @param bool $log_run   Whether to write an entry to the admin log
+	 * @param bool $wrap      Restart from the top when the end of the list is hit
 	 * @return array Array with keys users, rows, messages, dry_run and finished
 	 */
-	public function purge($max_users = 0, $dry_run = null, $log_run = true)
+	public function purge($max_users = 0, $dry_run = null, $log_run = true, $wrap = true)
 	{
 		$dry_run = $dry_run === null ? $this->is_dry_run() : (bool) $dry_run;
 		$stats   = ['users' => 0, 'rows' => 0, 'messages' => 0, 'dry_run' => $dry_run, 'finished' => true];
@@ -203,7 +211,7 @@ class purger
 		$candidates = $this->fetch_candidate_users($max_users, $cursor);
 
 		// End of the member list reached: start over from the beginning.
-		if (empty($candidates) && $cursor > 0)
+		if ($wrap && empty($candidates) && $cursor > 0)
 		{
 			$cursor     = 0;
 			$candidates = $this->fetch_candidate_users($max_users, $cursor);
@@ -211,13 +219,13 @@ class purger
 
 		if (empty($candidates))
 		{
-			$this->config->set('ecyaz_pmpurge_cursor', 0);
+			$this->config->set('ecyaz_pmpurge_cursor', 0, false);
 
 			return $stats;
 		}
 
 		$stats['finished'] = count($candidates) < $max_users;
-		$this->config->set('ecyaz_pmpurge_cursor', $stats['finished'] ? 0 : (int) end($candidates));
+		$this->config->set('ecyaz_pmpurge_cursor', $stats['finished'] ? 0 : (int) end($candidates), false);
 
 		$user_ids = $this->remove_exempt_users($candidates);
 
@@ -283,6 +291,19 @@ class purger
 		}
 
 		return $stats;
+	}
+
+	/**
+	 * Start the next walk of the member list from the beginning.
+	 *
+	 * A run that intends to cover the whole list once calls this first, so a
+	 * cursor left mid-list by the cron cannot make it skip the front.
+	 *
+	 * @return void
+	 */
+	public function restart()
+	{
+		$this->config->set('ecyaz_pmpurge_cursor', 0, false);
 	}
 
 	/**
