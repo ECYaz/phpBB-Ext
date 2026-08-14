@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+* The extension now calls itself PM Purge everywhere, matching the name of its phpBB.com contribution. It was Old PMs Purger before, which the customisation database rejects because the two names must be identical. No functional changes.
+
 ## 1.0.1
 
 Addresses the informational notes from the phpBB.com validation of 1.0.0.

@@ -10,11 +10,11 @@ if (!defined('IN_PHPBB'))
 }
 
 $lang = array_merge($lang ?? [], [
-	'ACP_PMPURGE_TITLE'    => 'Old PMs Purger',
-	'ACP_PMPURGE_SETTINGS' => 'Old PMs Purger',
+	'ACP_PMPURGE_TITLE'    => 'PM Purge',
+	'ACP_PMPURGE_SETTINGS' => 'PM Purge',
 
 	'PMPURGE_SETTINGS_EXPLAIN' => 'Removes the private messages of members who have not visited for a long time. Only messages are deleted: member accounts, posts and profiles are never touched. Deletion goes through phpBB’s own routine, so folder counts, unread counters, notifications and message attachments are all kept in step.',
-	'PMPURGE_SAVED'            => 'Old PMs Purger settings have been saved.',
+	'PMPURGE_SAVED'            => 'PM Purge settings have been saved.',
 	'PMPURGE_NOT_CONFIGURED'   => 'Set an inactivity period of at least one day before running a purge.',
 	'PMPURGE_NEVER'            => 'Never',
 	'PMPURGE_DAYS'             => 'days',

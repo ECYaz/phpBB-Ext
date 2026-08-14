@@ -1,4 +1,4 @@
-# Old PMs Purger
+# PM Purge
 
 Purges the private messages of members who have not visited for a long time, on
 the board's cron, from the ACP, or from the command line. Built for phpBB
@@ -43,8 +43,8 @@ phpBB 3.3.0 or higher on PHP 7.1.3 or higher.
 1. Download [`pmpurge.zip`](https://github.com/ECYaz/phpBB-Ext/raw/main/pmpurge.zip)
    and unzip it into your board's `ext/` directory (it unpacks to
    `ext/ecyaz/pmpurge/`), or copy this folder to `ext/ecyaz/pmpurge/`.
-2. ACP → Customise → Manage extensions → enable **Old PMs Purger**.
-3. ACP → Maintenance → **Old PMs Purger**.
+2. ACP → Customise → Manage extensions → enable **PM Purge**.
+3. ACP → Maintenance → **PM Purge**.
 
 Requires `a_userdel` (the same permission as core's Prune users).
 

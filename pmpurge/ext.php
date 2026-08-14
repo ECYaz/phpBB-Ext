@@ -1,6 +1,6 @@
 <?php
 /**
- * Old PMs Purger extension for phpBB.
+ * PM Purge extension for phpBB.
  *
  * @copyright (c) 2026 ECYaz
  * @license GPL-2.0-only
