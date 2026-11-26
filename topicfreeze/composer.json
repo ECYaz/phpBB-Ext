@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Lets moderators freeze a topic: members can still reply, but every reply waits for moderator approval.",
     "homepage": "https://github.com/ECYaz/phpBB-Ext",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "license": "GPL-2.0-only",
     "authors": [
         { "name": "ECYaz" }

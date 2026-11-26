@@ -103,6 +103,7 @@ class main_listener implements EventSubscriberInterface
 			'core.modify_quickmod_options'					=> 'handle_quickmod_action',
 			'core.viewtopic_assign_template_vars_before'	=> 'viewtopic_notice',
 			'core.viewtopic_modify_post_action_conditions'	=> 'viewtopic_post_actions',
+			'core.viewtopic_modify_page_title'				=> 'viewtopic_hide_bump',
 			'core.modify_posting_auth'						=> 'posting_auth',
 			'core.posting_modify_template_vars'				=> 'posting_notice',
 			'core.modify_submit_post_data'					=> 'queue_reply',
@@ -283,6 +284,22 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
+	 * Do not offer "Bump topic" to members in a frozen topic. Core assigns the
+	 * link after core.viewtopic_assign_template_vars_before, so it is cleared
+	 * here, with the same condition posting_auth() uses to refuse the bump.
+	 *
+	 * @param \phpbb\event\data	$event	Event object
+	 * @return void
+	 */
+	public function viewtopic_hide_bump($event)
+	{
+		if (!empty($event['topic_data']['topic_frozen']) && !$this->auth->acl_get('m_edit', (int) $event['forum_id']))
+		{
+			$this->template->assign_var('U_BUMP_TOPIC', '');
+		}
+	}
+
+	/**
 	 * Refuse edits, deletions and bumps from members in a frozen topic. This
 	 * is the enforcing half of viewtopic_post_actions().
 	 *
@@ -291,8 +308,9 @@ class main_listener implements EventSubscriberInterface
 	 */
 	public function posting_auth($event)
 	{
-		// A posting form can delete any attachment of its author, wherever
-		// that attachment is posted
+		// A posting form acts on every attachment id it is sent: "delete file"
+		// and "save draft" delete it, "submit" rewrites its comment. Core only
+		// checks that it belongs to the author of the post being written.
 		if ($this->has_frozen_attachment($this->get_form_attachment_ids()))
 		{
 			$error = $event['error'];
@@ -389,10 +407,10 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Refuse to delete attachments of posts in a frozen topic from the UCP:
-	 * the attachment list and the private message form. Core refuses the
-	 * first for a locked topic, but offers no event there, so the request is
-	 * checked before the module runs.
+	 * Refuse to change or delete attachments of posts in a frozen topic from
+	 * the UCP: the attachment list and the private message form. Core refuses
+	 * the first for a locked topic, but offers no event there, so the request
+	 * is checked before the module runs.
 	 *
 	 * @param \phpbb\event\data	$event	Event object
 	 * @return void
@@ -416,19 +434,14 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Attachment ids sent along with a "delete file" request of a posting
-	 * form. Such a form accepts any attachment of the author, also one that
-	 * belongs to an older post.
+	 * Attachment ids sent along with a posting form. Core reads them on every
+	 * request of such a form, whichever button was pressed, and accepts any
+	 * attachment of the author, also one that belongs to an older post.
 	 *
 	 * @return array
 	 */
 	protected function get_form_attachment_ids()
 	{
-		if (!$this->request->is_set_post('delete_file'))
-		{
-			return [];
-		}
-
 		$attach_ids = [];
 		$attachment_data = $this->request->variable('attachment_data', [0 => ['' => '']], true, \phpbb\request\request_interface::POST);
 
@@ -444,8 +457,9 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Is one of these attachments of the current user part of a post in a
-	 * frozen topic that the user may not edit as a moderator?
+	 * Is one of these attachments part of a post in a frozen topic that the
+	 * current user may not edit as a moderator? The owner of the attachment
+	 * does not matter: a moderator of another forum can post the ids too.
 	 *
 	 * @param array	$attach_ids	Attachment ids
 	 * @return bool
@@ -464,7 +478,6 @@ class main_listener implements EventSubscriberInterface
 			WHERE ' . $this->db->sql_in_set('a.attach_id', $attach_ids) . '
 				AND a.in_message = 0
 				AND a.is_orphan = 0
-				AND a.poster_id = ' . (int) $this->user->data['user_id'] . '
 				AND p.post_id = a.post_msg_id
 				AND t.topic_id = p.topic_id
 				AND t.topic_frozen = 1';

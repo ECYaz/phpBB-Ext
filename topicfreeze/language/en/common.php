@@ -23,7 +23,7 @@ $lang = array_merge($lang, [
 	'TOPICFREEZE_NOTICE'			=> 'This topic is frozen. Replies from members only appear after a moderator has approved them.',
 	'TOPICFREEZE_NOTICE_QUEUED'		=> 'This topic is frozen. You can still reply, but your reply will only appear after a moderator has approved it.',
 	'TOPICFREEZE_POST_ACTION_DENIED'	=> 'This topic is frozen. You cannot edit, delete or bump posts in it.',
-	'TOPICFREEZE_ATTACHMENT_DENIED'		=> 'At least one of the selected attachments belongs to a post in a frozen topic. Attachments in a frozen topic cannot be deleted.',
+	'TOPICFREEZE_ATTACHMENT_DENIED'		=> 'At least one of the selected attachments belongs to a post in a frozen topic. Attachments in a frozen topic cannot be changed or deleted.',
 
 	'TOPICFREEZE_FREEZE_TOPIC'				=> 'Freeze topic',
 	'TOPICFREEZE_FREEZE_TOPIC_CONFIRM'		=> 'Are you sure you want to freeze this topic? Members can still reply, but every reply will wait for moderator approval.',

@@ -15,8 +15,10 @@ Freezing it lets the useful replies through while the rest never appear.
   notification.
 * Anyone who can approve posts in that forum replies as normal.
 * Members cannot edit, delete or bump posts in a frozen topic, the same way
-  phpBB treats a locked topic. That includes deleting the attachments of those
-  posts from the User Control Panel. Moderators keep their tools.
+  phpBB treats a locked topic. That includes changing or deleting the
+  attachments of those posts, from any posting form or from the User Control
+  Panel. The topic starter is not offered "Bump topic" either. Moderators keep
+  their tools.
 * Poll voting stays open.
 * A notice at the top of the topic, above the quick reply box and on the reply
   form explains that the topic is frozen. Frozen topics carry a snowflake icon
