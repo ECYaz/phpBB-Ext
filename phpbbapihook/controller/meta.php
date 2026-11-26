@@ -21,15 +21,14 @@ class meta extends base
 	protected $auth;
 
 	public function __construct(
-		\ecyaz\phpbbapihook\api\authenticator $authenticator,
+		\ecyaz\phpbbapihook\api\gateway $gateway,
 		\ecyaz\phpbbapihook\api\responder $responder,
-		\ecyaz\phpbbapihook\api\logger $logger,
 		\phpbb\request\request_interface $request,
 		\phpbb\user $user,
 		\phpbb\auth\auth $auth
 	)
 	{
-		parent::__construct($authenticator, $responder, $logger, $request, $user);
+		parent::__construct($gateway, $responder, $request, $user);
 
 		$this->auth = $auth;
 	}
@@ -46,6 +45,7 @@ class meta extends base
 				'read_only'      => $ctx->is_read_only(),
 				'is_founder'     => (int) $this->user->data['user_type'] === USER_FOUNDER,
 				'allowed_forums' => $ctx->get_allowed_forums(),
+				'allowed_extensions' => $ctx->get_allowed_extensions(),
 			]);
 		});
 	}

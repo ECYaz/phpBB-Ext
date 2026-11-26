@@ -3,6 +3,44 @@
 All notable changes to **phpbbAPIhook** are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] (2026-11-26)
+
+Other extensions can now offer their own endpoints through the API.
+
+### Added
+- `ecyaz.phpbbapihook.gateway` service: another extension calls
+  `handle($extension, $action, $fn)` to run its own endpoint behind the same
+  credentials, limits, JSON errors and audit log. The request runs as the linked
+  user, so the extension's own permissions apply.
+- Event `ecyaz.phpbbapihook.collect_endpoints` to announce endpoints. Extension
+  endpoints live under `/api/ext/<vendor>/<package>/`; `handle()` refuses
+  anything that was not announced.
+- Event `ecyaz.phpbbapihook.request_authenticated` to refuse a request, and
+  event `ecyaz.phpbbapihook.response_before` to add fields to a success response
+  (core endpoints included).
+- Per credential setting **Extension endpoints** in the ACP: the extensions a
+  credential may call. Empty for every existing credential, which means none.
+- `GET /api/extensions` lists the extension endpoints a credential may call.
+- `GET /api/me/permissions` now includes `allowed_extensions`.
+- New error codes: `extension_not_allowed` (403), `endpoint_not_registered` (404),
+  `endpoint_path_mismatch` (404), `method_not_allowed` (405).
+
+### Changed
+- The read only flag is now enforced in one place for every request that is not
+  GET or HEAD, so no endpoint (core or third party) can forget it.
+- A PHP error inside an endpoint is answered with `internal_error` (500) instead
+  of an HTML error page.
+
+### Fixed
+- A request now carries the member flags of the linked user (`is_registered`),
+  so core and other extensions no longer see the member as a guest. Posts made
+  through the API no longer store a guest name next to the member.
+- The help text of the User ID field no longer suggests 0 for guests; a
+  credential needs an active member account.
+
+### Database
+- New column `ext_access` on `phpbb_apihook_keys` (migration `v_1_2_0`).
+
 ## [1.1.0] — 2026-07-02
 
 New read endpoints. No schema or config changes; existing boards receive the

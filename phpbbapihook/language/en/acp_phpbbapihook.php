@@ -38,7 +38,6 @@ $lang = array_merge($lang, [
 	'ACP_PHPBBAPIHOOK_COL_RATE'			=> 'Rate Limit',
 	'ACP_PHPBBAPIHOOK_COL_EXPIRES'		=> 'Expires',
 	'ACP_PHPBBAPIHOOK_COL_LAST_USED'	=> 'Last Used',
-	'ACP_PHPBBAPIHOOK_COL_LAST_IP'		=> 'Last IP',
 	'ACP_PHPBBAPIHOOK_COL_ACTIONS'		=> 'Actions',
 
 	// Status labels
@@ -54,7 +53,7 @@ $lang = array_merge($lang, [
 	'ACP_PHPBBAPIHOOK_KEY_NAME'			=> 'Credential Name',
 	'ACP_PHPBBAPIHOOK_KEY_NAME_EXPLAIN'	=> 'A human-readable label for this API credential.',
 	'ACP_PHPBBAPIHOOK_USER_ID'			=> 'User ID',
-	'ACP_PHPBBAPIHOOK_USER_ID_EXPLAIN'	=> 'The phpBB user ID whose permissions this credential acts with. Use 0 for guest/anonymous.',
+	'ACP_PHPBBAPIHOOK_USER_ID_EXPLAIN'	=> 'The phpBB user ID whose permissions this credential acts with. It must be an active member account; guests and bots cannot be used.',
 	'ACP_PHPBBAPIHOOK_FORUM_IDS'		=> 'Allowed Forum IDs',
 	'ACP_PHPBBAPIHOOK_FORUM_IDS_EXPLAIN'	=> 'Comma-separated forum IDs this credential may access. Leave blank to allow all forums.',
 	'ACP_PHPBBAPIHOOK_IP_ALLOWLIST'		=> 'IP Allowlist',
@@ -65,6 +64,10 @@ $lang = array_merge($lang, [
 	'ACP_PHPBBAPIHOOK_EXPIRATION_EXPLAIN'	=> 'Date this credential expires in YYYY-MM-DD format. Leave blank for no expiration.',
 	'ACP_PHPBBAPIHOOK_READ_ONLY_FIELD'	=> 'Read-only',
 	'ACP_PHPBBAPIHOOK_READ_ONLY_EXPLAIN'	=> 'If checked, this credential may only perform read operations (GET requests).',
+	'ACP_PHPBBAPIHOOK_EXT_ACCESS'		=> 'Extension endpoints',
+	'ACP_PHPBBAPIHOOK_EXT_ACCESS_EXPLAIN'	=> 'Other extensions can offer their own endpoints through this API. Enter the extensions this credential may use as vendor/package names separated by commas, or a single * for every extension. Leave blank to allow none. The permissions of the linked user still apply to every request.',
+	'ACP_PHPBBAPIHOOK_EXT_ACCESS_AVAILABLE'	=> 'Extensions offering endpoints on this board: %s',
+	'ACP_PHPBBAPIHOOK_EXT_ACCESS_NONE'	=> 'No installed extension offers endpoints at the moment.',
 	'ACP_PHPBBAPIHOOK_IS_ENABLED'		=> 'Enabled',
 	'ACP_PHPBBAPIHOOK_IS_ENABLED_EXPLAIN'	=> 'Uncheck to temporarily disable this credential without deleting it.',
 
@@ -84,7 +87,6 @@ $lang = array_merge($lang, [
 	'ACP_PHPBBAPIHOOK_ACTION_DISABLE'	=> 'Disable',
 	'ACP_PHPBBAPIHOOK_ACTION_DELETE'	=> 'Delete',
 	'ACP_PHPBBAPIHOOK_ACTION_VIEWLOG'	=> 'View Log',
-	'ACP_PHPBBAPIHOOK_ACTION_ADD'		=> 'Add API Credential',
 	'ACP_PHPBBAPIHOOK_BACK_TO_LIST'		=> 'Back to credentials list',
 
 	// New token notice (shown once after creation)
@@ -93,10 +95,10 @@ $lang = array_merge($lang, [
 	'ACP_PHPBBAPIHOOK_TOKEN_LABEL'		=> 'API Token',
 
 	// Success / error messages
-	'ACP_PHPBBAPIHOOK_ADDED'			=> 'API credential created successfully.',
 	'ACP_PHPBBAPIHOOK_UPDATED'			=> 'API credential updated successfully.',
 	'ACP_PHPBBAPIHOOK_DELETED'			=> 'API credential deleted successfully.',
 	'ACP_PHPBBAPIHOOK_NOT_FOUND'		=> 'The requested API credential could not be found.',
+	'ACP_PHPBBAPIHOOK_INVALID_EXT_ACCESS'	=> 'These entries of the extension endpoints field are not valid extension names: %s<br />Use vendor/package names (letters, digits and underscores), or a single * for every extension.',
 	'ACP_PHPBBAPIHOOK_INVALID_USER'		=> 'The specified User ID does not exist. Please enter a valid phpBB user ID.',
 	'ACP_PHPBBAPIHOOK_CONFIRM_DELETE'	=> 'Are you sure you want to permanently delete this API credential? Any applications using it will immediately lose access.',
 	'ACP_PHPBBAPIHOOK_NO_KEYS'			=> 'No API credentials have been created yet.',

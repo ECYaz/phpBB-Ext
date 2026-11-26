@@ -22,6 +22,7 @@ A secure, permission-controlled REST API extension for phpBB 3.3.x. It lets exte
 - **Audit logging** — every request is recorded with timestamp, IP, method, route, and outcome.
 - **ACP management** — create, edit, enable/disable, and delete credentials from the Administration Control Panel. The token is shown **once** at creation time.
 - **HTTPS enforcement** — can be toggled per-site; enabled by default.
+- **Open to other extensions**: any extension can offer its own endpoints through this API, with the same keys, limits and audit log. See [For extension authors](#for-extension-authors).
 
 ---
 
@@ -60,6 +61,7 @@ After enabling the extension, go to **Administration Control Panel → Mods → 
    - **Rate Limit** — max requests per rate window (default 1 hour); 0 = unlimited.
    - **Expiration Date** — `YYYY-MM-DD`, or blank for no expiry.
    - **Read-only** — check to restrict this credential to GET requests only.
+   - **Extension endpoints**: the extensions whose endpoints this credential may call, as `vendor/package` names separated by commas, or `*` for all of them. Blank means none.
    - **Enabled** — uncheck to temporarily suspend the credential.
 3. Click **Save**. The **API token is displayed once** on the confirmation page — copy it immediately.
 
@@ -121,6 +123,11 @@ Every error response uses the same shape:
 | 429         | `rate_limit_exceeded`      | Credential has exceeded its rate limit.              |
 | 429         | `flood_control`            | phpBB flood-control interval not yet elapsed.        |
 | 400         | `search_query_too_short`   | Query is too short or contains no indexable terms.   |
+| 403         | `extension_not_allowed`    | The credential was not given access to this extension. |
+| 404         | `endpoint_not_registered`  | The extension never announced this endpoint.         |
+| 404         | `endpoint_path_mismatch`   | An extension endpoint was called outside its own path. |
+| 405         | `method_not_allowed`       | The HTTP method differs from the announced one.      |
+| 500         | `internal_error`           | The endpoint failed. Details are never sent to the client. |
 | 503         | `api_disabled`             | Master API switch is off in ACP.                     |
 | 503         | `search_unavailable`       | Full-text search is disabled on the board, or the search backend failed to initialise. |
 
@@ -279,11 +286,49 @@ curl https://example.com/phpBB/app.php/api/me/permissions \
   "username": "mybot",
   "read_only": false,
   "is_founder": false,
-  "allowed_forums": []
+  "allowed_forums": [],
+  "allowed_extensions": ["acme/demo"]
 }
 ```
 
-(`allowed_forums` is an empty array when the credential is allowed all forums.)
+(`allowed_forums` is an empty array when the credential is allowed all forums.
+`allowed_extensions` is an empty array when the credential may not call any
+extension endpoint, and `["*"]` when it may call all of them.)
+
+---
+
+### GET /api/extensions
+
+List the endpoints that other extensions offer through the API. Only extensions
+this credential was given access to are listed.
+
+**Example:**
+
+```bash
+curl https://example.com/phpBB/app.php/api/extensions \
+  -H "X-API-Key: pbapi_abc123..."
+```
+
+**Success (200):**
+
+```json
+{
+  "success": true,
+  "extensions": [
+    {
+      "name": "acme/demo",
+      "endpoints": [
+        {
+          "action": "topic.freeze",
+          "method": "POST",
+          "path": "/api/ext/acme/demo/topics/{topic_id}/freeze",
+          "description": "Freeze a topic."
+        }
+      ]
+    }
+  ]
+}
+```
 
 ---
 
@@ -524,6 +569,141 @@ curl "https://example.com/phpBB/app.php/api/search?q=hello+world&type=posts&limi
 
 `snippet` (post results only) is a plain-text excerpt of up to 200 characters
 stripped of BBCode tags.
+
+---
+
+## For extension authors
+
+Your extension can offer its own endpoints through phpbbAPIhook. You write the
+endpoint, phpbbAPIhook takes care of the rest: the API key, the IP and rate
+limits, the read only flag, the JSON error format and the audit log. The request
+runs as the phpBB user linked to the key, so your usual permission checks work,
+including permissions that your own extension adds.
+
+A board admin decides per credential which extensions it may call (the
+**Extension endpoints** field). A new or existing credential cannot call any
+extension endpoint until the admin allows it.
+
+### 1. Add a route under your own path
+
+Every extension endpoint lives under `/api/ext/<vendor>/<package>/`.
+
+```yaml
+# config/routing.yml
+acme_demo_api_freeze:
+    path: /api/ext/acme/demo/topics/{topic_id}/freeze
+    methods: [POST]
+    requirements: { topic_id: '\d+' }
+    defaults: { _controller: acme.demo.controller.api:freeze }
+```
+
+### 2. Announce the endpoint
+
+```php
+// event/listener.php
+public static function getSubscribedEvents()
+{
+    return ['ecyaz.phpbbapihook.collect_endpoints' => 'collect_endpoints'];
+}
+
+public function collect_endpoints($event)
+{
+    $endpoints = $event['endpoints'];
+    $endpoints[] = [
+        'extension'   => 'acme/demo',
+        'action'      => 'topic.freeze',
+        'method'      => 'POST',
+        'path'        => '/api/ext/acme/demo/topics/{topic_id}/freeze',
+        'description' => 'Freeze a topic.',
+    ];
+    $event['endpoints'] = $endpoints;
+}
+```
+
+`handle()` refuses an endpoint that was not announced. Rows are ignored when the
+extension is not enabled, when the path is outside your own prefix, or when the
+action name contains anything other than lower case letters, digits, dots and
+underscores.
+
+### 3. Run the endpoint through the gateway
+
+Ask for the gateway as an optional service, so your extension keeps working
+when phpbbAPIhook is not installed.
+
+```yaml
+# config/services.yml
+services:
+    acme.demo.controller.api:
+        class: acme\demo\controller\api
+        arguments:
+            - '@?ecyaz.phpbbapihook.gateway'
+            - '@auth'
+```
+
+```php
+// controller/api.php
+public function __construct($gateway, \phpbb\auth\auth $auth)
+{
+    $this->gateway = $gateway;
+    $this->auth    = $auth;
+}
+
+public function freeze($topic_id)
+{
+    if ($this->gateway === null)
+    {
+        return new \Symfony\Component\HttpFoundation\JsonResponse(['success' => false, 'error' => 'api_unavailable'], 503);
+    }
+
+    return $this->gateway->handle('acme/demo', 'topic.freeze', function ($ctx) use ($topic_id) {
+        $forum_id = $this->forum_of_topic($topic_id);
+
+        // The forum allow list of the credential.
+        $ctx->assert_forum($forum_id);
+
+        // Your own permission, checked for the linked user.
+        if (!$this->auth->acl_get('m_acme_freeze', $forum_id))
+        {
+            $this->gateway->fail('insufficient_permissions', 403);
+        }
+
+        $this->freeze_topic($topic_id);
+
+        return ['topic_id' => (int) $topic_id, 'frozen' => true];
+    });
+}
+```
+
+What the gateway gives you:
+
+| Call | What it does |
+|------|--------------|
+| `$gateway->handle($extension, $action, $fn)` | Authenticates, applies the limits of the credential, runs `$fn` and returns the JSON response. An array returned by `$fn` becomes `{"success": true, ...}`. |
+| `$gateway->success($data, $status)` | A success response with another status, for example 201. |
+| `$gateway->fail($code, $status)` | Stops with `{"success": false, "error": "<code>"}`. |
+| `$ctx->get_user_id()` | The user the request runs as. |
+| `$ctx->is_read_only()` | Whether the credential is read only. |
+| `$ctx->can_access_forum($forum_id)` | Whether the forum allow list of the credential permits the forum. |
+| `$ctx->assert_forum($forum_id)` | The same check, stopping with `forum_not_allowed`. |
+
+What is enforced for you, and what is not:
+
+- A read only credential is refused on every request that is not GET or HEAD, before your code runs. Use GET only for endpoints that change nothing.
+- The forum allow list cannot be applied automatically, because only your endpoint knows which forum it touches. Call `$ctx->assert_forum()` whenever your endpoint acts on a forum, a topic or a post.
+- Core checks such as `f_read`, post visibility, locked topics and forum passwords are yours to make, exactly as on a normal page of your extension.
+- Errors and exceptions thrown inside `$fn` reach the client as `internal_error` only. Do not call `trigger_error()` inside `$fn`, it would print an HTML page.
+
+### Events
+
+| Event | Purpose |
+|-------|---------|
+| `ecyaz.phpbbapihook.collect_endpoints` | Announce your endpoints (`endpoints`). |
+| `ecyaz.phpbbapihook.request_authenticated` | Runs after the credential was accepted and before the endpoint. Set `error` (and `error_status`) to refuse the request. Variables: `extension`, `action`, `method`, `key_id`, `user_id`, `read_only`. |
+| `ecyaz.phpbbapihook.response_before` | Runs before a success response is sent. Change `data` to add fields, also to the core endpoints such as `topic.read`. Variables: `extension`, `action`, `key_id`, `user_id`, `status`, `data`. |
+
+For core endpoints `extension` is an empty string and `action` is one of
+`topic.create`, `topic.reply`, `topic.read`, `topic.posts`, `forum.list`,
+`forum.topics`, `post.read`, `search`, `me.permissions`, `extensions.list`.
 
 ---
 

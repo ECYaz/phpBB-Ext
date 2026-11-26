@@ -47,3 +47,8 @@ ecyaz_phpbbapihook_search:
     path: /api/search
     methods: [GET]
     defaults: { _controller: ecyaz.phpbbapihook.controller.search:search }
+
+ecyaz_phpbbapihook_extensions:
+    path: /api/extensions
+    methods: [GET]
+    defaults: { _controller: ecyaz.phpbbapihook.controller.extensions:list_endpoints }

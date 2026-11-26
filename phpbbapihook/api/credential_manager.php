@@ -31,7 +31,7 @@ class credential_manager
 	/** Fields an admin/API may set on a credential. */
 	protected static $writable = [
 		'key_name', 'user_id', 'forum_ids', 'ip_allowlist',
-		'rate_limit', 'read_only', 'is_enabled', 'expiration',
+		'rate_limit', 'read_only', 'is_enabled', 'expiration', 'ext_access',
 	];
 
 	public function __construct(\phpbb\db\driver\driver_interface $db, $keys_table)
@@ -62,6 +62,7 @@ class credential_manager
 			'read_only'    => 0,
 			'is_enabled'   => 1,
 			'expiration'   => 0,
+			'ext_access'   => '',
 		], array_intersect_key($data, array_flip(self::$writable)));
 
 		$row['key_token_hash'] = hash('sha256', $token);

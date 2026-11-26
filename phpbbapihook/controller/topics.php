@@ -42,9 +42,8 @@ class topics extends base
 	protected $php_ext;
 
 	public function __construct(
-		\ecyaz\phpbbapihook\api\authenticator $authenticator,
+		\ecyaz\phpbbapihook\api\gateway $gateway,
 		\ecyaz\phpbbapihook\api\responder $responder,
-		\ecyaz\phpbbapihook\api\logger $logger,
 		\phpbb\request\request_interface $request,
 		\phpbb\user $user,
 		\phpbb\auth\auth $auth,
@@ -56,7 +55,7 @@ class topics extends base
 		$php_ext
 	)
 	{
-		parent::__construct($authenticator, $responder, $logger, $request, $user);
+		parent::__construct($gateway, $responder, $request, $user);
 
 		$this->auth               = $auth;
 		$this->config             = $config;
