@@ -26,6 +26,26 @@ services:
             - '@ecyaz.phpbbapihook.logger'
             - '%core.table_prefix%users'
 
+    ecyaz.phpbbapihook.registry:
+        class: ecyaz\phpbbapihook\api\registry
+        arguments:
+            - '@dispatcher'
+            - '@ext.manager'
+
+    # Public entry point for other extensions: inject it as
+    # '@?ecyaz.phpbbapihook.gateway' and call handle().
+    ecyaz.phpbbapihook.gateway:
+        class: ecyaz\phpbbapihook\api\gateway
+        arguments:
+            - '@ecyaz.phpbbapihook.authenticator'
+            - '@ecyaz.phpbbapihook.responder'
+            - '@ecyaz.phpbbapihook.logger'
+            - '@ecyaz.phpbbapihook.registry'
+            - '@request'
+            - '@symfony_request'
+            - '@user'
+            - '@dispatcher'
+
     ecyaz.phpbbapihook.content_renderer:
         class: ecyaz\phpbbapihook\api\content_renderer
         arguments:
@@ -35,9 +55,8 @@ services:
     ecyaz.phpbbapihook.controller.topics:
         class: ecyaz\phpbbapihook\controller\topics
         arguments:
-            - '@ecyaz.phpbbapihook.authenticator'
+            - '@ecyaz.phpbbapihook.gateway'
             - '@ecyaz.phpbbapihook.responder'
-            - '@ecyaz.phpbbapihook.logger'
             - '@request'
             - '@user'
             - '@auth'
@@ -51,9 +70,8 @@ services:
     ecyaz.phpbbapihook.controller.forums:
         class: ecyaz\phpbbapihook\controller\forums
         arguments:
-            - '@ecyaz.phpbbapihook.authenticator'
+            - '@ecyaz.phpbbapihook.gateway'
             - '@ecyaz.phpbbapihook.responder'
-            - '@ecyaz.phpbbapihook.logger'
             - '@request'
             - '@user'
             - '@auth'
@@ -63,9 +81,8 @@ services:
     ecyaz.phpbbapihook.controller.posts:
         class: ecyaz\phpbbapihook\controller\posts
         arguments:
-            - '@ecyaz.phpbbapihook.authenticator'
+            - '@ecyaz.phpbbapihook.gateway'
             - '@ecyaz.phpbbapihook.responder'
-            - '@ecyaz.phpbbapihook.logger'
             - '@request'
             - '@user'
             - '@auth'
@@ -76,9 +93,8 @@ services:
     ecyaz.phpbbapihook.controller.meta:
         class: ecyaz\phpbbapihook\controller\meta
         arguments:
-            - '@ecyaz.phpbbapihook.authenticator'
+            - '@ecyaz.phpbbapihook.gateway'
             - '@ecyaz.phpbbapihook.responder'
-            - '@ecyaz.phpbbapihook.logger'
             - '@request'
             - '@user'
             - '@auth'
@@ -86,9 +102,8 @@ services:
     ecyaz.phpbbapihook.controller.search:
         class: ecyaz\phpbbapihook\controller\search
         arguments:
-            - '@ecyaz.phpbbapihook.authenticator'
+            - '@ecyaz.phpbbapihook.gateway'
             - '@ecyaz.phpbbapihook.responder'
-            - '@ecyaz.phpbbapihook.logger'
             - '@request'
             - '@user'
             - '@auth'
@@ -99,3 +114,12 @@ services:
             - '@dispatcher'
             - '%core.root_path%'
             - '%core.php_ext%'
+
+    ecyaz.phpbbapihook.controller.extensions:
+        class: ecyaz\phpbbapihook\controller\extensions
+        arguments:
+            - '@ecyaz.phpbbapihook.gateway'
+            - '@ecyaz.phpbbapihook.responder'
+            - '@request'
+            - '@user'
+            - '@ecyaz.phpbbapihook.registry'

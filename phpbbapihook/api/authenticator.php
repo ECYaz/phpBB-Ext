@@ -144,6 +144,13 @@ class authenticator
 		// with the linked account and load its ACL. From here on every
 		// permission check and submit_post() call runs as this account.
 		$this->user->data = array_merge($this->user->data, $user_row);
+
+		// The session started as a guest. load_user() only returns real
+		// accounts, so set the two flags the session code derives from the
+		// user row; core and other extensions read them to tell a member
+		// from a guest.
+		$this->user->data['is_registered'] = true;
+		$this->user->data['is_bot']        = false;
 		$this->auth->acl($this->user->data);
 
 		$this->credentials->touch((int) $cred['key_id'], $ip);

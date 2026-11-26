@@ -93,4 +93,65 @@ class auth_context
 
 		return in_array((int) $forum_id, array_map('intval', $ids), true);
 	}
+
+	/**
+	 * Extensions whose endpoints this credential may call.
+	 *
+	 * @return string[] An empty array for none, ['*'] for every extension,
+	 *                  otherwise a list of vendor/package names.
+	 */
+	public function get_allowed_extensions()
+	{
+		$raw = isset($this->credential['ext_access']) ? trim((string) $this->credential['ext_access']) : '';
+
+		if ($raw === '')
+		{
+			return [];
+		}
+
+		if ($raw === '*')
+		{
+			return ['*'];
+		}
+
+		$names = json_decode($raw, true);
+
+		return is_array($names) ? array_values(array_filter($names, 'is_string')) : [];
+	}
+
+	/**
+	 * Whether this credential may call endpoints offered by the given
+	 * extension. Fails closed: no stored choice, or one that cannot be read,
+	 * means no access.
+	 *
+	 * @param string $extension vendor/package
+	 * @return bool
+	 */
+	public function can_use_extension($extension)
+	{
+		$allowed = $this->get_allowed_extensions();
+
+		if ($allowed === ['*'])
+		{
+			return true;
+		}
+
+		return in_array(strtolower((string) $extension), array_map('strtolower', $allowed), true);
+	}
+
+	/**
+	 * Stop the request unless the credential's forum allow list permits the
+	 * forum. Endpoints that act on a forum, topic or post call this in
+	 * addition to their own permission checks.
+	 *
+	 * @param int $forum_id
+	 * @throws exception With forum_not_allowed when the forum is outside the list.
+	 */
+	public function assert_forum($forum_id)
+	{
+		if (!$this->can_access_forum($forum_id))
+		{
+			throw new exception('forum_not_allowed', 403);
+		}
+	}
 }

@@ -47,8 +47,8 @@ class logger
 			'log_time'   => time(),
 			'log_ip'     => substr((string) $ip, 0, 40),
 			'log_method' => substr((string) $method, 0, 8),
-			'log_route'  => substr((string) $route, 0, 255),
-			'log_action' => substr((string) $action, 0, 255),
+			'log_route'  => utf8_substr((string) $route, 0, 255),
+			'log_action' => utf8_substr((string) $action, 0, 255),
 			'log_status' => (int) $status,
 			'log_detail' => (string) $detail,
 		];

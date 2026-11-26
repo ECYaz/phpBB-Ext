@@ -10,26 +10,21 @@
 
 namespace ecyaz\phpbbapihook\controller;
 
-use ecyaz\phpbbapihook\api\exception;
-
 /**
- * Shared plumbing for every API controller: it authenticates the request,
- * dispatches the action, converts any api\exception into a JSON error, writes
- * one audit-log row per request, and parses JSON (or form) input.
+ * Shared plumbing for every API controller: it hands the request to the
+ * gateway (authentication, credential restrictions, JSON errors, audit log)
+ * and parses JSON (or form) input.
  *
  * Subclasses implement the individual endpoints and call run() to execute them
  * inside this envelope.
  */
 abstract class base
 {
-	/** @var \ecyaz\phpbbapihook\api\authenticator */
-	protected $authenticator;
+	/** @var \ecyaz\phpbbapihook\api\gateway */
+	protected $gateway;
 
 	/** @var \ecyaz\phpbbapihook\api\responder */
 	protected $responder;
-
-	/** @var \ecyaz\phpbbapihook\api\logger */
-	protected $logger;
 
 	/** @var \phpbb\request\request_interface */
 	protected $request;
@@ -41,18 +36,16 @@ abstract class base
 	private $body_cache = null;
 
 	public function __construct(
-		\ecyaz\phpbbapihook\api\authenticator $authenticator,
+		\ecyaz\phpbbapihook\api\gateway $gateway,
 		\ecyaz\phpbbapihook\api\responder $responder,
-		\ecyaz\phpbbapihook\api\logger $logger,
 		\phpbb\request\request_interface $request,
 		\phpbb\user $user
 	)
 	{
-		$this->authenticator = $authenticator;
-		$this->responder     = $responder;
-		$this->logger        = $logger;
-		$this->request       = $request;
-		$this->user          = $user;
+		$this->gateway   = $gateway;
+		$this->responder = $responder;
+		$this->request   = $request;
+		$this->user      = $user;
 	}
 
 	/**
@@ -64,44 +57,7 @@ abstract class base
 	 */
 	protected function run($action_name, callable $fn)
 	{
-		$key_id = 0;
-
-		try
-		{
-			$ctx    = $this->authenticator->authenticate();
-			$key_id = $ctx->get_key_id();
-
-			$response = $fn($ctx);
-
-			$this->audit($key_id, $action_name, $response->getStatusCode(), '');
-
-			return $response;
-		}
-		catch (exception $e)
-		{
-			$this->audit($key_id, $action_name, $e->get_status_code(), $e->get_error_code());
-
-			return $this->responder->from_exception($e);
-		}
-		catch (\Exception $e)
-		{
-			$this->audit($key_id, $action_name, 500, 'internal_error');
-
-			return $this->responder->error('internal_error', 500);
-		}
-	}
-
-	protected function audit($key_id, $action, $status, $detail)
-	{
-		$this->logger->log(
-			$key_id,
-			(string) $this->user->ip,
-			(string) $this->request->server('REQUEST_METHOD'),
-			(string) $this->request->server('REQUEST_URI'),
-			$action,
-			$status,
-			$detail
-		);
+		return $this->gateway->run($action_name, $fn);
 	}
 
 	/**

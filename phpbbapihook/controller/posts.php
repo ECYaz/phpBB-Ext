@@ -24,9 +24,8 @@ class posts extends base
 	protected $content_renderer;
 
 	public function __construct(
-		\ecyaz\phpbbapihook\api\authenticator $authenticator,
+		\ecyaz\phpbbapihook\api\gateway $gateway,
 		\ecyaz\phpbbapihook\api\responder $responder,
-		\ecyaz\phpbbapihook\api\logger $logger,
 		\phpbb\request\request_interface $request,
 		\phpbb\user $user,
 		\phpbb\auth\auth $auth,
@@ -35,7 +34,7 @@ class posts extends base
 		\ecyaz\phpbbapihook\api\content_renderer $content_renderer
 	)
 	{
-		parent::__construct($authenticator, $responder, $logger, $request, $user);
+		parent::__construct($gateway, $responder, $request, $user);
 		$this->auth = $auth;
 		$this->db = $db;
 		$this->content_visibility = $content_visibility;

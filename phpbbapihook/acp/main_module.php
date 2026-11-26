@@ -21,6 +21,9 @@ class main_module
 	/** @var string */
 	public $page_title;
 
+	/** @var string[] Entries of the extension endpoints field that were refused. */
+	protected $invalid_ext_names = [];
+
 	public function main($id, $mode)
 	{
 		global $request, $template, $user, $db, $phpbb_container;
@@ -35,6 +38,9 @@ class main_module
 
 		/** @var \ecyaz\phpbbapihook\api\logger $logger */
 		$logger = $phpbb_container->get('ecyaz.phpbbapihook.logger');
+
+		/** @var \ecyaz\phpbbapihook\api\registry $registry */
+		$registry = $phpbb_container->get('ecyaz.phpbbapihook.registry');
 
 		$form_key = 'phpbbapihook';
 		add_form_key($form_key);
@@ -104,6 +110,11 @@ class main_module
 				trigger_error($user->lang('ACP_PHPBBAPIHOOK_INVALID_USER') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 
+			if (!empty($this->invalid_ext_names))
+			{
+				trigger_error($user->lang('ACP_PHPBBAPIHOOK_INVALID_EXT_ACCESS', htmlspecialchars(implode(', ', $this->invalid_ext_names), ENT_COMPAT)) . adm_back_link($this->u_action), E_USER_WARNING);
+			}
+
 			$credential_manager->update($key_id, $data);
 			trigger_error($user->lang('ACP_PHPBBAPIHOOK_UPDATED') . adm_back_link($this->u_action));
 		}
@@ -123,6 +134,11 @@ class main_module
 			if ($data === null)
 			{
 				trigger_error($user->lang('ACP_PHPBBAPIHOOK_INVALID_USER') . adm_back_link($this->u_action), E_USER_WARNING);
+			}
+
+			if (!empty($this->invalid_ext_names))
+			{
+				trigger_error($user->lang('ACP_PHPBBAPIHOOK_INVALID_EXT_ACCESS', htmlspecialchars(implode(', ', $this->invalid_ext_names), ENT_COMPAT)) . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 
 			$result    = $credential_manager->create($data);
@@ -161,6 +177,7 @@ class main_module
 				'EDIT_IP_ALLOWLIST'	=> $row['ip_allowlist'],
 				'EDIT_RATE_LIMIT'	=> $row['rate_limit'],
 				'EDIT_EXPIRATION'	=> $expiration_str,
+				'EDIT_EXT_ACCESS'	=> $this->ext_access_for_form(isset($row['ext_access']) ? $row['ext_access'] : ''),
 				'S_EDIT_READ_ONLY'	=> (bool) $row['read_only'],
 				'S_EDIT_ENABLED'	=> (bool) $row['is_enabled'],
 				'U_SAVE'			=> $this->u_action . '&amp;action=save&amp;id=' . $row['key_id'],
@@ -247,6 +264,7 @@ class main_module
 		}
 
 		$template->assign_vars([
+			'EXT_ACCESS_AVAILABLE'	=> implode(', ', $registry->extension_names()),
 			'U_ACTION'		=> $this->u_action,
 			'U_ADD_ACTION'	=> $this->u_action . '&amp;action=add',
 			'S_ACTION'		=> $action,
@@ -271,6 +289,7 @@ class main_module
 		$expiration_s  = $request->variable('expiration', '');
 		$read_only     = $request->variable('read_only', 0);
 		$is_enabled    = $request->variable('is_enabled', 0);
+		$ext_access    = $this->parse_ext_access($request->variable('ext_access', ''));
 
 		// Validate user_id if provided
 		if ($user_id > 0)
@@ -319,6 +338,68 @@ class main_module
 			'read_only'     => $read_only ? 1 : 0,
 			'is_enabled'    => $is_enabled ? 1 : 0,
 			'expiration'    => $expiration,
+			'ext_access'    => $ext_access,
 		];
+	}
+
+	/**
+	 * Turn the "extension endpoints" form field into its stored form.
+	 *
+	 * @param string $raw A star for every extension, or vendor/package names
+	 *                    separated by commas or spaces.
+	 * @return string '' for none, '*' for all, otherwise a JSON list of names.
+	 */
+	protected function parse_ext_access($raw)
+	{
+		$names = [];
+		$all   = false;
+
+		$this->invalid_ext_names = [];
+
+		// The request class already HTML escaped the value; names never
+		// contain characters that escaping changes, so anything that did
+		// change is reported as invalid below.
+		foreach (preg_split('/[\s,]+/', (string) $raw, -1, PREG_SPLIT_NO_EMPTY) as $part)
+		{
+			if ($part === '*')
+			{
+				$all = true;
+			}
+			else if (\ecyaz\phpbbapihook\api\registry::is_valid_extension_name($part))
+			{
+				$names[] = strtolower($part);
+			}
+			else
+			{
+				$this->invalid_ext_names[] = htmlspecialchars_decode($part, ENT_COMPAT);
+			}
+		}
+
+		if ($all)
+		{
+			return '*';
+		}
+
+		return empty($names) ? '' : json_encode(array_values(array_unique($names)));
+	}
+
+	/**
+	 * The stored extension access as the text shown in the edit form.
+	 *
+	 * @param string $stored
+	 * @return string
+	 */
+	protected function ext_access_for_form($stored)
+	{
+		$stored = trim((string) $stored);
+
+		if ($stored === '' || $stored === '*')
+		{
+			return $stored;
+		}
+
+		$names = json_decode($stored, true);
+
+		return is_array($names) ? implode(', ', array_filter($names, 'is_string')) : '';
 	}
 }

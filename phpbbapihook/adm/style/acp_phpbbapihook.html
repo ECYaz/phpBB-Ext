@@ -100,6 +100,14 @@
 			</dd>
 		</dl>
 		<dl>
+			<dt><label for="ext_access">{L_ACP_PHPBBAPIHOOK_EXT_ACCESS}{L_COLON}</label></dt>
+			<dd>
+				<input type="text" id="ext_access" name="ext_access" value="{{ EDIT_EXT_ACCESS|e }}" size="60" />
+				<p>{L_ACP_PHPBBAPIHOOK_EXT_ACCESS_EXPLAIN}</p>
+				<p>{% if EXT_ACCESS_AVAILABLE %}{{ lang('ACP_PHPBBAPIHOOK_EXT_ACCESS_AVAILABLE', EXT_ACCESS_AVAILABLE) }}{% else %}{{ lang('ACP_PHPBBAPIHOOK_EXT_ACCESS_NONE') }}{% endif %}</p>
+			</dd>
+		</dl>
+		<dl>
 			<dt><label for="read_only">{L_ACP_PHPBBAPIHOOK_READ_ONLY_FIELD}{L_COLON}</label></dt>
 			<dd>
 				<input type="checkbox" id="read_only" name="read_only" value="1"<!-- IF S_EDIT_READ_ONLY --> checked="checked"<!-- ENDIF --> />
@@ -217,6 +225,14 @@
 			<dd>
 				<input type="text" id="expiration" name="expiration" value="" size="12" placeholder="YYYY-MM-DD" />
 				<p>{L_ACP_PHPBBAPIHOOK_EXPIRATION_EXPLAIN}</p>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="ext_access">{L_ACP_PHPBBAPIHOOK_EXT_ACCESS}{L_COLON}</label></dt>
+			<dd>
+				<input type="text" id="ext_access" name="ext_access" value="" size="60" />
+				<p>{L_ACP_PHPBBAPIHOOK_EXT_ACCESS_EXPLAIN}</p>
+				<p>{% if EXT_ACCESS_AVAILABLE %}{{ lang('ACP_PHPBBAPIHOOK_EXT_ACCESS_AVAILABLE', EXT_ACCESS_AVAILABLE) }}{% else %}{{ lang('ACP_PHPBBAPIHOOK_EXT_ACCESS_NONE') }}{% endif %}</p>
 			</dd>
 		</dl>
 		<dl>
