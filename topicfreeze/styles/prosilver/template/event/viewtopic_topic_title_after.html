@@ -1,0 +1,8 @@
+{% if S_TOPICFREEZE_FROZEN %}
+<div class="rules topicfreeze-notice">
+	<div class="inner">
+		<i class="icon fa-snowflake-o fa-fw" aria-hidden="true"></i> <strong>{{ lang('TOPICFREEZE_FROZEN') }}</strong><br>
+		{% if S_TOPICFREEZE_QUEUED %}{{ lang('TOPICFREEZE_NOTICE_QUEUED') }}{% else %}{{ lang('TOPICFREEZE_NOTICE') }}{% endif %}
+	</div>
+</div>
+{% endif %}

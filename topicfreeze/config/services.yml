@@ -1,0 +1,18 @@
+services:
+    ecyaz.topicfreeze.listener:
+        class: ecyaz\topicfreeze\event\main_listener
+        arguments:
+            - '@auth'
+            - '@dbal.conn'
+            - '@language'
+            - '@log'
+            - '@request'
+            - '@template'
+            - '@user'
+            - '%tables.attachments%'
+            - '%tables.posts%'
+            - '%tables.topics%'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+        tags:
+            - { name: event.listener }
