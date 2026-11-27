@@ -43,6 +43,9 @@ class authenticator
 	/** @var string */
 	protected $users_table;
 
+	/** @var int Id of the credential the last token belonged to, 0 if none was found. */
+	protected $last_key_id = 0;
+
 	public function __construct(
 		\phpbb\config\config $config,
 		\phpbb\request\request_interface $request,
@@ -72,6 +75,8 @@ class authenticator
 	 */
 	public function authenticate()
 	{
+		$this->last_key_id = 0;
+
 		if (!(int) $this->config['phpbbapihook_master_enabled'])
 		{
 			throw new exception('api_disabled', 503);
@@ -95,6 +100,9 @@ class authenticator
 		{
 			throw new exception('invalid_token', 401);
 		}
+
+		// Known from here on, so a refusal below is logged for this credential.
+		$this->last_key_id = (int) $cred['key_id'];
 
 		if (!(int) $cred['is_enabled'])
 		{
@@ -156,6 +164,18 @@ class authenticator
 		$this->credentials->touch((int) $cred['key_id'], $ip);
 
 		return new auth_context($cred, $user_row);
+	}
+
+	/**
+	 * The credential the last authenticate() call found for the token, also
+	 * when the request was then refused (expired, disabled, wrong IP, rate
+	 * limit, unavailable or banned account).
+	 *
+	 * @return int 0 when no credential matched the token.
+	 */
+	public function get_last_key_id()
+	{
+		return $this->last_key_id;
 	}
 
 	/**

@@ -11,7 +11,7 @@
 namespace ecyaz\phpbbapihook\api;
 
 /**
- * Renders a stored phpBB post row into display HTML and human-readable (uid-stripped) BBCode.
+ * Renders a stored phpBB post row into display HTML and into its BBCode source as plain text.
  */
 class content_renderer
 {
@@ -59,7 +59,8 @@ class content_renderer
 
 		return [
 			'content_html'   => (string) $html,
-			'content_bbcode' => (string) $edit['text'],
+			// generate_text_for_edit() escapes for a textarea; the API sends plain text.
+			'content_bbcode' => htmlspecialchars_decode((string) $edit['text'], ENT_COMPAT),
 		];
 	}
 }

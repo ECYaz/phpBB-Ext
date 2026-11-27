@@ -41,7 +41,7 @@ class meta extends base
 		return $this->run('me.permissions', function (\ecyaz\phpbbapihook\api\auth_context $ctx) {
 			return $this->responder->success([
 				'user_id'        => (int) $this->user->data['user_id'],
-				'username'       => (string) $this->user->data['username'],
+				'username'       => $this->plain($this->user->data['username']),
 				'read_only'      => $ctx->is_read_only(),
 				'is_founder'     => (int) $this->user->data['user_type'] === USER_FOUNDER,
 				'allowed_forums' => $ctx->get_allowed_forums(),

@@ -3,6 +3,54 @@
 All notable changes to **phpbbAPIhook** are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.1] (2026-11-26)
+
+Fixes from the validation review of 1.2.0.
+
+### Security
+- A topic title sent in a JSON body was stored without HTML escaping and could
+  run script for visitors. JSON values now get the same treatment as form
+  values (trimmed, escaped, NFC normalised).
+- Posting now follows the board settings and the forum permissions of the
+  linked user for BBCode, images, flash, smilies, links and signatures, as the
+  posting form does.
+- A category or a link forum no longer takes topics (`forum_not_postable`).
+- A moderator can no longer reply to a topic that waits for approval or was
+  soft deleted (`topic_unapproved`).
+- Search now asks for the `u_search` permission and respects the search flood
+  interval (`search_flood_control`).
+- Search results are checked again when they are loaded, so a cached result no
+  longer shows a post that was soft deleted or moved to a forum the user
+  cannot read.
+
+### Changed
+- Titles, subjects, user names, forum names and `content_bbcode` are returned
+  as plain text instead of HTML escaped text. What is read from
+  `content_bbcode` can be sent back unchanged.
+- Rate limited requests (429) no longer count towards the rate limit.
+
+### Added
+- API settings in the ACP: API enabled, Require HTTPS, rate window and the
+  number of days the audit log is kept.
+- A daily cron task deletes old audit log entries (90 days by default).
+- The ACP shows the log of requests that came without a valid token.
+- New error codes: `forum_not_postable` (403), `topic_unapproved` (403),
+  `unsupported_characters_title` (400), `search_query_too_long` (400),
+  `search_flood_control` (429).
+
+### Fixed
+- An emoji in a topic title or in a credential name ended in an SQL error on
+  MySQL.
+- A forum listing now includes global announcements made in other forums the
+  user can read.
+- Credential names and log routes with an ampersand were escaped twice in the
+  ACP, once more on every save.
+- An expiration date that cannot be read is refused instead of being saved as
+  "never expires".
+- A request refused for a known credential (expired, disabled, wrong IP, rate
+  limit, banned account) is logged under that credential.
+- A search with more words than the board allows answered with an HTML page.
+
 ## [1.2.0] (2026-11-26)
 
 Other extensions can now offer their own endpoints through the API.

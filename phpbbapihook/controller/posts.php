@@ -90,17 +90,17 @@ class posts extends base
 					'post_time'      => (int) $row['post_time'],
 					'edit_count'     => (int) $row['post_edit_count'],
 					'edit_time'      => (int) $row['post_edit_time'],
-					'subject'        => (string) $row['post_subject'],
+					'subject'        => $this->plain($row['post_subject']),
 					'content_html'   => $rendered['content_html'],
 					'content_bbcode' => $rendered['content_bbcode'],
 				],
 				'topic' => [
 					'topic_id' => (int) $row['topic_id'],
 					'forum_id' => $forum_id,
-					'title'    => (string) $row['topic_title'],
+					'title'    => $this->plain($row['topic_title']),
 					'locked'   => ((int) $row['topic_status'] === ITEM_LOCKED),
 				],
-				'forum' => ['forum_id' => $forum_id, 'name' => (string) $row['forum_name']],
+				'forum' => ['forum_id' => $forum_id, 'name' => $this->plain($row['forum_name'])],
 			]);
 		});
 	}

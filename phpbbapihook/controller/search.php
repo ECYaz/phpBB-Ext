@@ -64,9 +64,17 @@ class search extends base
 			{
 				throw new exception('search_unavailable', 503);
 			}
-			if (!$this->auth->acl_getf_global('f_search'))
+			// The same gates as search.php: the user permission, a forum
+			// permission somewhere, and the search flood interval.
+			if (!$this->auth->acl_get('u_search') || !$this->auth->acl_getf_global('f_search'))
 			{
 				throw new exception('insufficient_permissions', 403);
+			}
+
+			$interval = (int) $this->config['search_interval'];
+			if ($interval && !$this->auth->acl_get('u_ignoreflood') && (int) $this->user->data['user_last_search'] > time() - $interval)
+			{
+				throw new exception('search_flood_control', 429);
 			}
 
 			$keywords = trim($this->request->variable('q', '', true));
@@ -134,11 +142,21 @@ class search extends base
 					// No such author -> empty result set, not an error.
 					return $this->responder->success([
 						'type'       => $type,
-						'query'      => $original_keywords,
+						'query'      => $this->plain($original_keywords),
 						'pagination' => ['limit' => $pg['limit'], 'offset' => $pg['offset'], 'total' => 0, 'count' => 0],
 						'results'    => [],
 					]);
 				}
+			}
+
+			// The search backend stops a query with too many words through
+			// trigger_error(), which would print an HTML page. Refuse it here.
+			// Counting every run of letters and digits never counts fewer
+			// words than the backend does.
+			$max_keywords = (int) $this->config['max_num_search_keywords'];
+			if ($max_keywords && count(preg_split('#[^\p{L}\p{N}]+#u', $this->plain($keywords), -1, PREG_SPLIT_NO_EMPTY)) > $max_keywords)
+			{
+				throw new exception('search_query_too_long', 400);
 			}
 
 			$correct_query = $search->split_keywords($keywords, 'all');
@@ -172,18 +190,29 @@ class search extends base
 			}
 
 			$id_ary = array_map('intval', (array) $id_ary);
-			$results = ($type === 'posts') ? $this->hydrate_posts($id_ary) : $this->hydrate_topics($id_ary);
+			$results = ($type === 'posts') ? $this->hydrate_posts($id_ary, $ex_fid_ary) : $this->hydrate_topics($id_ary, $ex_fid_ary);
 
 			return $this->responder->success([
 				'type'       => $type,
-				'query'      => $original_keywords,
+				'query'      => $this->plain($original_keywords),
 				'pagination' => ['limit' => $pg['limit'], 'offset' => $requested_offset, 'total' => (int) $total, 'count' => count($results)],
 				'results'    => $results,
 			]);
 		});
 	}
 
-	protected function hydrate_posts(array $post_ids)
+	/**
+	 * Load the posts of a result page.
+	 *
+	 * The search backend caches the matching ids, and that cache is not
+	 * cleared when a post is soft deleted or a topic is moved. Like search.php,
+	 * the forum exclusion and the visibility check are applied again here.
+	 *
+	 * @param int[] $post_ids
+	 * @param int[] $ex_fid_ary Forums the request may not see.
+	 * @return array
+	 */
+	protected function hydrate_posts(array $post_ids, array $ex_fid_ary)
 	{
 		if (empty($post_ids))
 		{
@@ -193,7 +222,9 @@ class search extends base
 				p.post_text, p.bbcode_uid, p.bbcode_bitfield, u.username
 			FROM ' . POSTS_TABLE . ' p
 			LEFT JOIN ' . USERS_TABLE . ' u ON u.user_id = p.poster_id
-			WHERE ' . $this->db->sql_in_set('p.post_id', $post_ids);
+			WHERE ' . $this->db->sql_in_set('p.post_id', $post_ids) . '
+				AND ' . $this->content_visibility->get_global_visibility_sql('post', $ex_fid_ary, 'p.') .
+				(count($ex_fid_ary) ? ' AND ' . $this->db->sql_in_set('p.forum_id', $ex_fid_ary, true) : '');
 		$res = $this->db->sql_query($sql);
 		$rows = [];
 		while ($row = $this->db->sql_fetchrow($res))
@@ -224,7 +255,14 @@ class search extends base
 		return $out;
 	}
 
-	protected function hydrate_topics(array $topic_ids)
+	/**
+	 * Load the topics of a result page, with the same checks as hydrate_posts().
+	 *
+	 * @param int[] $topic_ids
+	 * @param int[] $ex_fid_ary Forums the request may not see.
+	 * @return array
+	 */
+	protected function hydrate_topics(array $topic_ids, array $ex_fid_ary)
 	{
 		if (empty($topic_ids))
 		{
@@ -232,7 +270,9 @@ class search extends base
 		}
 		$sql = 'SELECT topic_id, forum_id, topic_title, topic_first_poster_name, topic_last_post_time
 			FROM ' . TOPICS_TABLE . '
-			WHERE ' . $this->db->sql_in_set('topic_id', $topic_ids);
+			WHERE ' . $this->db->sql_in_set('topic_id', $topic_ids) . '
+				AND ' . $this->content_visibility->get_global_visibility_sql('topic', $ex_fid_ary) .
+				(count($ex_fid_ary) ? ' AND ' . $this->db->sql_in_set('forum_id', $ex_fid_ary, true) : '');
 		$res = $this->db->sql_query($sql);
 		$rows = [];
 		while ($row = $this->db->sql_fetchrow($res))
@@ -252,8 +292,8 @@ class search extends base
 			$out[] = [
 				'topic_id'       => (int) $row['topic_id'],
 				'forum_id'       => (int) $row['forum_id'],
-				'title'          => (string) $row['topic_title'],
-				'poster'         => (string) $row['topic_first_poster_name'],
+				'title'          => $this->plain($row['topic_title']),
+				'poster'         => $this->plain($row['topic_first_poster_name']),
 				'last_post_time' => (int) $row['topic_last_post_time'],
 			];
 		}

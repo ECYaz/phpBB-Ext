@@ -24,9 +24,12 @@ class main_module
 	/** @var string[] Entries of the extension endpoints field that were refused. */
 	protected $invalid_ext_names = [];
 
+	/** @var bool Whether the expiration date of the form could not be read. */
+	protected $invalid_expiration = false;
+
 	public function main($id, $mode)
 	{
-		global $request, $template, $user, $db, $phpbb_container;
+		global $config, $request, $template, $user, $db, $phpbb_container;
 
 		$user->add_lang_ext('ecyaz/phpbbapihook', 'acp_phpbbapihook');
 
@@ -94,6 +97,24 @@ class main_module
 		}
 
 		// ------------------------------------------------------------------ //
+		// SETTINGS (board wide switches)
+		// ------------------------------------------------------------------ //
+		if ($action === 'settings' && $request->is_set_post('submit'))
+		{
+			if (!check_form_key($form_key))
+			{
+				trigger_error('FORM_INVALID', E_USER_WARNING);
+			}
+
+			$config->set('phpbbapihook_master_enabled', $request->variable('master_enabled', 0) ? 1 : 0);
+			$config->set('phpbbapihook_require_https', $request->variable('require_https', 0) ? 1 : 0);
+			$config->set('phpbbapihook_rate_window', max(60, $request->variable('rate_window', 3600)));
+			$config->set('phpbbapihook_log_days', max(0, $request->variable('log_days', 90)));
+
+			trigger_error($user->lang('ACP_PHPBBAPIHOOK_SETTINGS_SAVED') . adm_back_link($this->u_action));
+		}
+
+		// ------------------------------------------------------------------ //
 		// SAVE (edit existing)
 		// ------------------------------------------------------------------ //
 		if ($action === 'save' && $key_id && $request->is_set_post('submit'))
@@ -112,7 +133,12 @@ class main_module
 
 			if (!empty($this->invalid_ext_names))
 			{
-				trigger_error($user->lang('ACP_PHPBBAPIHOOK_INVALID_EXT_ACCESS', htmlspecialchars(implode(', ', $this->invalid_ext_names), ENT_COMPAT)) . adm_back_link($this->u_action), E_USER_WARNING);
+				trigger_error($user->lang('ACP_PHPBBAPIHOOK_INVALID_EXT_ACCESS', implode(', ', $this->invalid_ext_names)) . adm_back_link($this->u_action), E_USER_WARNING);
+			}
+
+			if ($this->invalid_expiration)
+			{
+				trigger_error($user->lang('ACP_PHPBBAPIHOOK_INVALID_EXPIRATION') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 
 			$credential_manager->update($key_id, $data);
@@ -138,7 +164,12 @@ class main_module
 
 			if (!empty($this->invalid_ext_names))
 			{
-				trigger_error($user->lang('ACP_PHPBBAPIHOOK_INVALID_EXT_ACCESS', htmlspecialchars(implode(', ', $this->invalid_ext_names), ENT_COMPAT)) . adm_back_link($this->u_action), E_USER_WARNING);
+				trigger_error($user->lang('ACP_PHPBBAPIHOOK_INVALID_EXT_ACCESS', implode(', ', $this->invalid_ext_names)) . adm_back_link($this->u_action), E_USER_WARNING);
+			}
+
+			if ($this->invalid_expiration)
+			{
+				trigger_error($user->lang('ACP_PHPBBAPIHOOK_INVALID_EXPIRATION') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 
 			$result    = $credential_manager->create($data);
@@ -187,9 +218,10 @@ class main_module
 		// ------------------------------------------------------------------ //
 		// VIEW LOG
 		// ------------------------------------------------------------------ //
-		if ($action === 'viewlog' && $key_id)
+		if ($action === 'viewlog')
 		{
-			$row = $credential_manager->get($key_id);
+			// Id 0 holds the requests that came without a valid token.
+			$row = ($key_id) ? $credential_manager->get($key_id) : ['key_name' => $user->lang('ACP_PHPBBAPIHOOK_LOG_NO_KEY')];
 			if ($row === null)
 			{
 				trigger_error($user->lang('ACP_PHPBBAPIHOOK_NOT_FOUND') . adm_back_link($this->u_action), E_USER_WARNING);
@@ -265,6 +297,12 @@ class main_module
 
 		$template->assign_vars([
 			'EXT_ACCESS_AVAILABLE'	=> implode(', ', $registry->extension_names()),
+			'S_MASTER_ENABLED'		=> (bool) $config['phpbbapihook_master_enabled'],
+			'S_REQUIRE_HTTPS'		=> (bool) $config['phpbbapihook_require_https'],
+			'RATE_WINDOW'			=> (int) $config['phpbbapihook_rate_window'],
+			'LOG_DAYS'				=> (int) $config['phpbbapihook_log_days'],
+			'U_SETTINGS_ACTION'		=> $this->u_action . '&amp;action=settings',
+			'U_VIEWLOG_NO_KEY'		=> $this->u_action . '&amp;action=viewlog&amp;id=0',
 			'U_ACTION'		=> $this->u_action,
 			'U_ADD_ACTION'	=> $this->u_action . '&amp;action=add',
 			'S_ACTION'		=> $action,
@@ -281,7 +319,9 @@ class main_module
 	 */
 	protected function parse_form_data($request, $db)
 	{
-		$key_name      = $request->variable('key_name', '', true);
+		// Emoji become character references (MySQL cannot store them here) and
+		// the escaped text is cut to the size of the column.
+		$key_name      = truncate_string(utf8_encode_ucr($request->variable('key_name', '', true)), 255, 255, false);
 		$user_id       = $request->variable('user_id', 0);
 		$forum_ids_raw = $request->variable('forum_ids', '');
 		$ip_allowlist  = $request->variable('ip_allowlist', '');
@@ -322,11 +362,23 @@ class main_module
 		$forum_ids = empty($forum_ids_arr) ? '' : json_encode(array_values(array_unique($forum_ids_arr)));
 
 		// Parse expiration date
+		// Only a real YYYY-MM-DD date is accepted. Anything else stops the save,
+		// so a mistyped date never turns into "never expires".
 		$expiration = 0;
-		if (trim($expiration_s) !== '')
+		$expiration_s = trim($expiration_s);
+		$this->invalid_expiration = false;
+		if ($expiration_s !== '')
 		{
-			$ts = strtotime($expiration_s);
-			$expiration = ($ts !== false && $ts > 0) ? $ts : 0;
+			$date = \DateTime::createFromFormat('!Y-m-d', $expiration_s, new \DateTimeZone('UTC'));
+
+			if ($date === false || $date->format('Y-m-d') !== $expiration_s)
+			{
+				$this->invalid_expiration = true;
+			}
+			else
+			{
+				$expiration = $date->getTimestamp();
+			}
 		}
 
 		return [
@@ -356,9 +408,9 @@ class main_module
 
 		$this->invalid_ext_names = [];
 
-		// The request class already HTML escaped the value; names never
-		// contain characters that escaping changes, so anything that did
-		// change is reported as invalid below.
+		// The request class already HTML escaped the value. Names never contain
+		// characters that escaping changes, and a refused entry is shown again
+		// as it was delivered, so it needs no further escaping.
 		foreach (preg_split('/[\s,]+/', (string) $raw, -1, PREG_SPLIT_NO_EMPTY) as $part)
 		{
 			if ($part === '*')
@@ -371,7 +423,7 @@ class main_module
 			}
 			else
 			{
-				$this->invalid_ext_names[] = htmlspecialchars_decode($part, ENT_COMPAT);
+				$this->invalid_ext_names[] = $part;
 			}
 		}
 

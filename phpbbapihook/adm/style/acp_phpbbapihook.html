@@ -13,7 +13,7 @@
 
 <!-- IF S_VIEW_LOG -->
 
-<h2>{L_ACP_PHPBBAPIHOOK_LOG_TITLE} &mdash; {{ LOG_KEY_NAME|e }}</h2>
+<h2>{L_ACP_PHPBBAPIHOOK_LOG_TITLE} &mdash; {LOG_KEY_NAME}</h2>
 <p><a href="{U_ACTION}">{L_ACP_PHPBBAPIHOOK_BACK_TO_LIST}</a></p>
 
 <!-- IF logs -->
@@ -35,7 +35,7 @@
 			<td>{logs.LOG_TIME}</td>
 			<td>{{ logs.LOG_IP|e }}</td>
 			<td>{{ logs.LOG_METHOD|e }}</td>
-			<td>{{ logs.LOG_ROUTE|e }}</td>
+			<td>{logs.LOG_ROUTE}</td>
 			<td>{{ logs.LOG_ACTION|e }}</td>
 			<td>{logs.LOG_STATUS}</td>
 			<td>{{ logs.LOG_DETAIL|e }}</td>
@@ -60,7 +60,7 @@
 		<dl>
 			<dt><label for="key_name">{L_ACP_PHPBBAPIHOOK_KEY_NAME}{L_COLON}</label></dt>
 			<dd>
-				<input type="text" id="key_name" name="key_name" value="{{ EDIT_KEY_NAME|e }}" size="40" maxlength="255" />
+				<input type="text" id="key_name" name="key_name" value="{EDIT_KEY_NAME}" size="40" maxlength="255" />
 				<p>{L_ACP_PHPBBAPIHOOK_KEY_NAME_EXPLAIN}</p>
 			</dd>
 		</dl>
@@ -81,7 +81,7 @@
 		<dl>
 			<dt><label for="ip_allowlist">{L_ACP_PHPBBAPIHOOK_IP_ALLOWLIST}{L_COLON}</label></dt>
 			<dd>
-				<input type="text" id="ip_allowlist" name="ip_allowlist" value="{{ EDIT_IP_ALLOWLIST|e }}" size="60" />
+				<input type="text" id="ip_allowlist" name="ip_allowlist" value="{EDIT_IP_ALLOWLIST}" size="60" />
 				<p>{L_ACP_PHPBBAPIHOOK_IP_ALLOWLIST_EXPLAIN}</p>
 			</dd>
 		</dl>
@@ -154,9 +154,9 @@
 		<!-- BEGIN keys -->
 		<tr>
 			<td>{keys.KEY_ID}</td>
-			<td>{{ keys.KEY_NAME|e }}</td>
+			<td>{keys.KEY_NAME}</td>
 			<td><code>{{ keys.KEY_PREFIX|e }}</code></td>
-			<td>{{ keys.USERNAME|e }}</td>
+			<td>{keys.USERNAME}</td>
 			<td>
 				<!-- IF keys.ENABLED -->{L_ACP_PHPBBAPIHOOK_ENABLED}<!-- ELSE -->{L_ACP_PHPBBAPIHOOK_DISABLED}<!-- ENDIF -->
 				&nbsp;/&nbsp;
@@ -178,6 +178,8 @@
 <!-- ELSE -->
 <p class="error">{L_ACP_PHPBBAPIHOOK_NO_KEYS}</p>
 <!-- ENDIF -->
+
+<p><a href="{U_VIEWLOG_NO_KEY}">{L_ACP_PHPBBAPIHOOK_LOG_NO_KEY_LINK}</a></p>
 
 <!-- Add credential form -->
 <h2>{L_ACP_PHPBBAPIHOOK_ADD_TITLE}</h2>
@@ -254,6 +256,38 @@
 		<legend>{L_ACP_SUBMIT_CHANGES}</legend>
 		<p class="submit-buttons">
 			<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />
+		</p>
+		{S_FORM_TOKEN}
+	</fieldset>
+</form>
+
+<!-- Board wide settings -->
+<h2>{L_ACP_PHPBBAPIHOOK_SETTINGS_TITLE}</h2>
+
+<form id="acp_phpbbapihook_settings" method="post" action="{U_SETTINGS_ACTION}">
+	<fieldset>
+		<legend>{L_ACP_PHPBBAPIHOOK_SETTINGS_TITLE}</legend>
+		<dl>
+			<dt><label for="master_enabled">{L_ACP_PHPBBAPIHOOK_MASTER_ENABLED}{L_COLON}</label><br /><span>{L_ACP_PHPBBAPIHOOK_MASTER_ENABLED_EXPLAIN}</span></dt>
+			<dd><input type="checkbox" id="master_enabled" name="master_enabled" value="1"<!-- IF S_MASTER_ENABLED --> checked="checked"<!-- ENDIF --> /></dd>
+		</dl>
+		<dl>
+			<dt><label for="require_https">{L_ACP_PHPBBAPIHOOK_REQUIRE_HTTPS}{L_COLON}</label><br /><span>{L_ACP_PHPBBAPIHOOK_REQUIRE_HTTPS_EXPLAIN}</span></dt>
+			<dd><input type="checkbox" id="require_https" name="require_https" value="1"<!-- IF S_REQUIRE_HTTPS --> checked="checked"<!-- ENDIF --> /></dd>
+		</dl>
+		<dl>
+			<dt><label for="rate_window">{L_ACP_PHPBBAPIHOOK_RATE_WINDOW}{L_COLON}</label><br /><span>{L_ACP_PHPBBAPIHOOK_RATE_WINDOW_EXPLAIN}</span></dt>
+			<dd><input type="number" id="rate_window" name="rate_window" value="{RATE_WINDOW}" min="60" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="log_days">{L_ACP_PHPBBAPIHOOK_LOG_DAYS}{L_COLON}</label><br /><span>{L_ACP_PHPBBAPIHOOK_LOG_DAYS_EXPLAIN}</span></dt>
+			<dd><input type="number" id="log_days" name="log_days" value="{LOG_DAYS}" min="0" /></dd>
+		</dl>
+	</fieldset>
+	<fieldset>
+		<legend>{L_ACP_SUBMIT_CHANGES}</legend>
+		<p class="submit-buttons">
+			<input class="button1" type="submit" name="submit" value="{L_SUBMIT}" />
 		</p>
 		{S_FORM_TOKEN}
 	</fieldset>

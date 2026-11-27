@@ -123,3 +123,13 @@ services:
             - '@request'
             - '@user'
             - '@ecyaz.phpbbapihook.registry'
+
+    ecyaz.phpbbapihook.cron.prune_log:
+        class: ecyaz\phpbbapihook\cron\prune_log
+        arguments:
+            - '@config'
+            - '@ecyaz.phpbbapihook.logger'
+        calls:
+            - [set_name, [cron.task.ecyaz.phpbbapihook.prune_log]]
+        tags:
+            - { name: cron.task }

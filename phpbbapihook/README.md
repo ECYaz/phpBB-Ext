@@ -18,7 +18,7 @@ A secure REST API extension for phpBB 3.3.x with permission control. It lets ext
 - **Read only flag**: prevent a credential from performing write operations.
 - **Full ACL enforcement**: the API calls phpBB's own `submit_post()` and `$auth->acl_get()`, so it cannot do anything the linked account could not do in the board UI.
 - **Audit logging**: every request is recorded with timestamp, IP, method, route, and outcome.
-- **ACP management**: create, edit, enable/disable, and delete credentials from the Administration Control Panel. The token is shown **once** at creation time.
+- **ACP management**: create, edit, enable/disable, and delete credentials from the Administration Control Panel. The token is shown **once** at creation time. The API switch, the HTTPS requirement, the rate window and the age of the audit log are set on the same page.
 - **HTTPS enforcement**: can be toggled for the whole board; enabled by default.
 - **Open to other extensions**: any extension can offer its own endpoints through this API, with the same keys, limits and audit log. See [For extension authors](#for-extension-authors).
 
@@ -41,6 +41,15 @@ A secure REST API extension for phpBB 3.3.x with permission control. It lets ext
 ## ACP Usage
 
 After enabling the extension, go to **Administration Control Panel → Mods → phpBB API Hook → Manage API Keys**.
+
+### API settings
+
+At the bottom of the same page:
+
+- **API enabled**: uncheck to switch the whole API off.
+- **Require HTTPS**: on after installation. On a board without HTTPS the API answers `https_required` until you switch this off.
+- **Rate window in seconds**: the period the rate limit of a credential is counted over.
+- **Keep the audit log for (days)**: older entries are deleted once a day; 0 keeps them forever.
 
 ### Creating a credential
 
@@ -78,6 +87,8 @@ X-API-Key: <token>
 
 All endpoints are under `app.php/api/` and return `application/json`.
 
+Text fields in a response (titles, subjects, user names, forum names and `content_bbcode`) are plain text, not HTML: a title reads `Tom & Jerry`, not `Tom &amp; Jerry`. Escape them yourself before you put them in a web page. `content_html` is the only field that holds HTML. What you read from `content_bbcode` can be sent back as `content` unchanged.
+
 ### Error envelope
 
 Every error response uses the same shape:
@@ -105,16 +116,23 @@ Every error response uses the same shape:
 | 403         | `ip_not_allowed`           | Caller's IP is not on the credential's allow list.   |
 | 403         | `https_required`           | Board requires HTTPS; request was HTTP.              |
 | 400         | `missing_fields`           | Required body field(s) absent.                       |
+| 400         | `invalid_topic_type`       | `type` is not `normal`, `sticky` or `announcement`.  |
+| 400         | `invalid_content`          | The board refused the post body, for example too long or too many smilies. |
+| 400         | `unsupported_characters_title` | The title contains emoji and the linked user may not use them (`u_emoji`). |
+| 403         | `forum_not_postable`       | The forum is a category or a link and takes no posts. |
+| 403         | `topic_unapproved`         | The topic waits for approval or was soft deleted; a moderator cannot reply to it. |
 | 404         | `topic_not_found`          | Topic does not exist or is not visible to the linked user. |
 | 404         | `forum_not_found`          | Forum does not exist.                                |
 | 404         | `post_not_found`           | Post does not exist or is not visible to the linked user. |
 | 400         | `search_query_too_short`   | Query is too short or contains no indexable terms.   |
+| 400         | `search_query_too_long`    | Query has more words than the board allows in one search. |
+| 429         | `search_flood_control`     | Searching faster than the board's search flood interval allows. |
 | 403         | `extension_not_allowed`    | The credential was not given access to this extension. |
 | 404         | `endpoint_not_registered`  | The extension never announced this endpoint.         |
 | 404         | `endpoint_path_mismatch`   | An extension endpoint was called outside its own path. |
 | 405         | `method_not_allowed`       | The HTTP method differs from the announced one.      |
 | 500         | `internal_error`           | The endpoint failed. Details are never sent to the client. |
-| 503         | `api_disabled`             | Master API switch is off in ACP.                     |
+| 503         | `api_disabled`             | The API is switched off in the ACP (API settings).   |
 | 503         | `search_unavailable`       | Full text search is disabled on the board, or the search backend failed to initialise. |
 
 ### POST /api/topics
@@ -671,10 +689,11 @@ For core endpoints `extension` is an empty string and `action` is one of
 
 ## Security Notes
 
-- **HTTPS only by default.** The `phpbbapihook_require_https` config option is `1` on installation. Disable it only in development (`ACP → Mods → phpBB API Hook` or directly in `phpbb_config`).
+- **HTTPS only by default.** After installation every request over plain HTTP is answered with `https_required`. Switch **Require HTTPS** off in the API settings only on a test board.
 - **Permissions are never bypassed.** The authenticator calls `$auth->acl($user->data)` with the credential's phpBB account, so every permission check respects the board's role and group assignments.
-- **Rate limiting** is tracked in the audit log table. The window size (default 3600 seconds) is stored in `phpbbapihook_rate_window`.
-- **Audit log.** Every request writes a row to `phpbb_apihook_log` with the time, IP, method, route, HTTP status, and error code. Viewable per credential in the ACP.
+- **Rate limiting** is counted from the audit log. The window (3600 seconds by default) is set in the API settings. Requests that were refused for the rate limit are not counted again.
+- **Audit log.** Every request writes a row to `phpbb_apihook_log` with the time, IP, method, route, HTTP status, and error code. Viewable per credential in the ACP, where requests without a valid token have a log of their own. Entries older than 90 days are deleted once a day; the number of days is set in the API settings.
+- **The API posts like the posting form.** BBCode, images, smilies, links and signatures follow the board settings and the forum permissions of the linked user, and titles are stored escaped whether they arrive as JSON or as form data.
 - **Tokens are hashed.** Only a SHA 256 hash of the token is stored. If you lose a token you must delete the credential and create a new one.
 
 ## Roadmap / Future Work

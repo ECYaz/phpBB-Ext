@@ -97,6 +97,8 @@ class topics extends base
 				throw new exception('insufficient_permissions', 403);
 			}
 
+			$title = $this->prepare_title($title);
+
 			$topic_type = $this->resolve_topic_type($type, $forum_id);
 
 			$this->flood_check($forum_id);
@@ -161,6 +163,15 @@ class topics extends base
 				throw new exception('insufficient_permissions', 403);
 			}
 
+			// Core does not let a moderator reply to a topic that is waiting
+			// for approval or was soft deleted (posting.php, "Not able to reply
+			// to unapproved posts/topics"). Other users never get this far,
+			// except the author of a queued topic, who may reply to it.
+			if ((int) $topic['topic_visibility'] != ITEM_APPROVED && $this->auth->acl_get('m_approve', $forum_id))
+			{
+				throw new exception('topic_unapproved', 403);
+			}
+
 			// Replying in a locked forum needs m_lock; password forums are off-limits.
 			$this->assert_forum_postable($topic, $forum_id, 'm_lock');
 
@@ -213,7 +224,7 @@ class topics extends base
 				'topic' => [
 					'topic_id'     => (int) $topic['topic_id'],
 					'forum_id'     => $forum_id,
-					'title'        => (string) $topic['topic_title'],
+					'title'        => $this->plain($topic['topic_title']),
 					'poster_id'    => (int) $topic['topic_poster'],
 					'post_count'   => (int) $topic['topic_posts_approved'],
 					'views'        => (int) $topic['topic_views'],
@@ -284,7 +295,7 @@ class topics extends base
 					'post_time'      => (int) $row['post_time'],
 					'edit_count'     => (int) $row['post_edit_count'],
 					'edit_time'      => (int) $row['post_edit_time'],
-					'subject'        => (string) $row['post_subject'],
+					'subject'        => $this->plain($row['post_subject']),
 					'content_html'   => $rendered['content_html'],
 					'content_bbcode' => $rendered['content_bbcode'],
 				];
@@ -295,7 +306,7 @@ class topics extends base
 				'topic'      => [
 					'topic_id' => $topic_id,
 					'forum_id' => $forum_id,
-					'title'    => (string) $topic['topic_title'],
+					'title'    => $this->plain($topic['topic_title']),
 					'locked'   => ((int) $topic['topic_status'] === ITEM_LOCKED),
 				],
 				'pagination' => ['limit' => $pg['limit'], 'offset' => $pg['offset'], 'total' => $total, 'count' => count($posts)],
@@ -335,6 +346,30 @@ class topics extends base
 	}
 
 	/**
+	 * Treat the title of a new topic as posting.php treats the subject: with
+	 * the u_emoji permission emoji are stored as character references,
+	 * without it they are refused (MySQL cannot store them in this column).
+	 *
+	 * @param string $title Already HTML escaped.
+	 * @return string
+	 * @throws exception
+	 */
+	protected function prepare_title($title)
+	{
+		if ($this->auth->acl_get('u_emoji'))
+		{
+			return utf8_encode_ucr($title);
+		}
+
+		if (preg_match('/[\x{10000}-\x{10FFFF}]/u', $title))
+		{
+			throw new exception('unsupported_characters_title', 400);
+		}
+
+		return $title;
+	}
+
+	/**
 	 * Reject access to a topic the linked user is not allowed to see (soft
 	 * deleted, or unapproved without m_approve). Reported as 'topic_not_found'
 	 * so the API never reveals the existence of a hidden topic.
@@ -352,19 +387,25 @@ class topics extends base
 	}
 
 	/**
-	 * Enforce the forum-level gates phpBB applies before posting (posting.php
-	 * line 469): a password-protected forum cannot be used through the API (the
-	 * forum password cannot be supplied), and a locked forum may only be posted
-	 * to with the relevant moderator permission — 'm_edit' for new topics,
-	 * 'm_lock' for replies.
+	 * Enforce the forum-level gates phpBB applies before posting (posting.php):
+	 * only a forum of the normal type takes posts (not a category or a link),
+	 * a password-protected forum cannot be used through the API (the forum
+	 * password cannot be supplied), and a locked forum may only be posted to
+	 * with the relevant moderator permission ('m_edit' for new topics,
+	 * 'm_lock' for replies).
 	 *
-	 * @param array  $forum_row     Row containing forum_status and forum_password.
+	 * @param array  $forum_row     Row containing forum_type, forum_status and forum_password.
 	 * @param int    $forum_id
 	 * @param string $lock_override Permission that overrides a forum lock.
 	 * @throws exception
 	 */
 	protected function assert_forum_postable(array $forum_row, $forum_id, $lock_override)
 	{
+		if ((int) $forum_row['forum_type'] != FORUM_POST)
+		{
+			throw new exception('forum_not_postable', 403);
+		}
+
 		if ((string) $forum_row['forum_password'] !== '')
 		{
 			throw new exception('forum_password_required', 403);
@@ -426,7 +467,16 @@ class topics extends base
 		$message_parser = new \parse_message();
 		$message_parser->message = $content;
 
-		$errors = $message_parser->parse(true, true, true);
+		// What the linked user may use in this forum, worked out as posting.php
+		// does from the board settings and the forum permissions.
+		$bbcode_status  = $this->config['allow_bbcode'] && $this->auth->acl_get('f_bbcode', $forum_id);
+		$smilies_status = $this->config['allow_smilies'] && $this->auth->acl_get('f_smilies', $forum_id);
+		$img_status     = $bbcode_status && $this->auth->acl_get('f_img', $forum_id);
+		$url_status     = (bool) $this->config['allow_post_links'];
+		$flash_status   = $bbcode_status && $this->auth->acl_get('f_flash', $forum_id) && $this->config['allow_post_flash'];
+		$sig_status     = $this->config['allow_sig'] && $this->auth->acl_get('f_sigs', $forum_id) && $this->auth->acl_get('u_sig') && $this->user->optionget('attachsig');
+
+		$errors = $message_parser->parse($bbcode_status, $url_status, $smilies_status, $img_status, $flash_status, true, $url_status);
 		if (!empty($errors))
 		{
 			throw new exception('invalid_content', 400, implode('; ', $errors));
@@ -445,10 +495,10 @@ class topics extends base
 			'forum_id'            => (int) $forum_id,
 			'icon_id'             => 0,
 			'poster_id'           => (int) $this->user->data['user_id'],
-			'enable_sig'          => true,
-			'enable_bbcode'       => true,
-			'enable_smilies'      => true,
-			'enable_urls'         => true,
+			'enable_sig'          => (bool) $sig_status,
+			'enable_bbcode'       => (bool) $bbcode_status,
+			'enable_smilies'      => (bool) $smilies_status,
+			'enable_urls'         => (bool) $url_status,
 			'enable_indexing'     => true,
 			// phpBB duplicate-post detection field; not security-sensitive
 			'message_md5'         => md5($message_parser->message),
@@ -484,7 +534,7 @@ class topics extends base
 	 */
 	protected function fetch_topic($topic_id)
 	{
-		$sql = 'SELECT t.*, f.forum_name, f.forum_status, f.forum_password
+		$sql = 'SELECT t.*, f.forum_name, f.forum_type, f.forum_status, f.forum_password
 			FROM ' . TOPICS_TABLE . ' t
 			JOIN ' . FORUMS_TABLE . ' f ON f.forum_id = t.forum_id
 			WHERE t.topic_id = ' . (int) $topic_id;

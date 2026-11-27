@@ -75,7 +75,7 @@ class forums extends base
 				$forums[] = [
 					'forum_id'  => $forum_id,
 					'parent_id' => (int) $row['parent_id'],
-					'name'      => (string) $row['forum_name'],
+					'name'      => $this->plain($row['forum_name']),
 					'type'      => (int) $row['forum_type'],
 					'can_read'  => (bool) $this->auth->acl_get('f_read', $forum_id),
 					'can_post'  => (bool) $this->auth->acl_get('f_post', $forum_id),
@@ -122,9 +122,28 @@ class forums extends base
 
 			$pg = $this->paginate_args();
 
+			// A global announcement stays in the forum it was posted in and is
+			// shown in every forum. Like viewforum.php, take them from the other
+			// forums the user can read; forums with a password and forums
+			// outside the allow list of the credential are left out.
+			$g_forum_ary = [];
+			$sql = 'SELECT forum_id, forum_password FROM ' . FORUMS_TABLE . ' WHERE forum_id <> ' . (int) $forum_id;
+			$res = $this->db->sql_query($sql);
+			while ($frow = $this->db->sql_fetchrow($res))
+			{
+				$fid = (int) $frow['forum_id'];
+				if ((string) $frow['forum_password'] === '' && $this->auth->acl_get('f_read', $fid) && $ctx->can_access_forum($fid))
+				{
+					$g_forum_ary[] = $fid;
+				}
+			}
+			$this->db->sql_freeresult($res);
+
+			$global_sql = empty($g_forum_ary) ? '' : '
+					OR (t.topic_type = ' . POST_GLOBAL . ' AND ' . $this->db->sql_in_set('t.forum_id', $g_forum_ary) . ' AND ' . $this->content_visibility->get_forums_visibility_sql('topic', $g_forum_ary, 't.') . ')';
+
 			$sql = 'SELECT COUNT(t.topic_id) AS total FROM ' . TOPICS_TABLE . ' t
-				WHERE ((t.forum_id = ' . (int) $forum_id . ' AND ' . $this->content_visibility->get_visibility_sql('topic', $forum_id, 't.') . ')
-					OR (t.forum_id = 0 AND t.topic_type = ' . POST_GLOBAL . ' AND ' . $this->content_visibility->get_visibility_sql('topic', 0, 't.') . '))';
+				WHERE ((t.forum_id = ' . (int) $forum_id . ' AND ' . $this->content_visibility->get_visibility_sql('topic', $forum_id, 't.') . ')' . $global_sql . ')';
 			$res = $this->db->sql_query($sql);
 			$total = (int) $this->db->sql_fetchfield('total');
 			$this->db->sql_freeresult($res);
@@ -133,8 +152,7 @@ class forums extends base
 					t.topic_first_poster_name, t.topic_posts_approved, t.topic_views, t.topic_time,
 					t.topic_last_post_time, t.topic_last_poster_id, t.topic_last_poster_name, t.topic_status
 				FROM ' . TOPICS_TABLE . ' t
-				WHERE ((t.forum_id = ' . (int) $forum_id . ' AND ' . $this->content_visibility->get_visibility_sql('topic', $forum_id, 't.') . ')
-					OR (t.forum_id = 0 AND t.topic_type = ' . POST_GLOBAL . ' AND ' . $this->content_visibility->get_visibility_sql('topic', 0, 't.') . '))
+				WHERE ((t.forum_id = ' . (int) $forum_id . ' AND ' . $this->content_visibility->get_visibility_sql('topic', $forum_id, 't.') . ')' . $global_sql . ')
 				ORDER BY t.topic_type DESC, t.topic_last_post_time DESC, t.topic_id DESC';
 			$res = $this->db->sql_query_limit($sql, $pg['limit'], $pg['offset']);
 
@@ -145,23 +163,23 @@ class forums extends base
 				$topics[] = [
 					'topic_id'        => (int) $row['topic_id'],
 					'forum_id'        => (int) $row['forum_id'],
-					'title'           => (string) $row['topic_title'],
+					'title'           => $this->plain($row['topic_title']),
 					'type'            => isset(self::$topic_type_names[$type]) ? self::$topic_type_names[$type] : 'normal',
 					'poster_id'       => (int) $row['topic_poster'],
-					'poster'          => (string) $row['topic_first_poster_name'],
+					'poster'          => $this->plain($row['topic_first_poster_name']),
 					'replies'         => max(0, (int) $row['topic_posts_approved'] - 1),
 					'views'           => (int) $row['topic_views'],
 					'first_post_time' => (int) $row['topic_time'],
 					'last_post_time'  => (int) $row['topic_last_post_time'],
 					'last_poster_id'  => (int) $row['topic_last_poster_id'],
-					'last_poster'     => (string) $row['topic_last_poster_name'],
+					'last_poster'     => $this->plain($row['topic_last_poster_name']),
 					'locked'          => ((int) $row['topic_status'] === ITEM_LOCKED),
 				];
 			}
 			$this->db->sql_freeresult($res);
 
 			return $this->responder->success([
-				'forum'      => ['forum_id' => $forum_id, 'name' => (string) $forum['forum_name']],
+				'forum'      => ['forum_id' => $forum_id, 'name' => $this->plain($forum['forum_name'])],
 				'pagination' => ['limit' => $pg['limit'], 'offset' => $pg['offset'], 'total' => $total, 'count' => count($topics)],
 				'topics'     => $topics,
 			]);

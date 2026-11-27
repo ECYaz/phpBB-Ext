@@ -85,10 +85,45 @@ abstract class base
 
 		if (array_key_exists($name, $body))
 		{
-			return is_scalar($body[$name]) ? (string) $body[$name] : $default;
+			if (!is_scalar($body[$name]))
+			{
+				return $default;
+			}
+
+			// A JSON value gets what the request class gives a form value:
+			// trimmed, HTML escaped, NFC normalised, invalid UTF-8 refused.
+			$value = '';
+			$type_cast_helper = new \phpbb\request\type_cast_helper();
+			$type_cast_helper->set_var($value, $body[$name], 'string', true);
+
+			return $value;
 		}
 
 		return (string) $this->request->variable($name, $default, true);
+	}
+
+	/**
+	 * Text as it leaves the API.
+	 *
+	 * phpBB stores titles, subjects, names and search words HTML escaped. A
+	 * JSON client expects plain text, and escapes it again when it sends the
+	 * value back, so the escaping is taken off here. Emoji are stored as
+	 * character references (utf8_encode_ucr) and are turned back into
+	 * characters first; a reference that a user typed is stored with an
+	 * escaped ampersand and stays text.
+	 *
+	 * @param mixed $text
+	 * @return string
+	 */
+	protected function plain($text)
+	{
+		$text = preg_replace_callback('/&#(x[0-9A-Fa-f]{5,6}|[0-9]{5,7});/', function ($match) {
+			$code_point = ($match[1][0] === 'x') ? hexdec(substr($match[1], 1)) : (int) $match[1];
+
+			return ($code_point >= 0x10000 && $code_point <= 0x10FFFF) ? utf8_chr($code_point) : $match[0];
+		}, (string) $text);
+
+		return htmlspecialchars_decode($text, ENT_COMPAT);
 	}
 
 	/**
@@ -123,16 +158,16 @@ abstract class base
 
 		if ((int) $row['poster_id'] === ANONYMOUS)
 		{
-			return ($post_username !== '') ? $post_username : $username;
+			return $this->plain(($post_username !== '') ? $post_username : $username);
 		}
 
 		if ($username !== '')
 		{
-			return $username;
+			return $this->plain($username);
 		}
 
 		// Hard-deleted registered poster: fall back to any stored guest name.
-		return $post_username;
+		return $this->plain($post_username);
 	}
 
 	/**

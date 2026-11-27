@@ -227,12 +227,17 @@ class gateway
 		}
 		catch (exception $e)
 		{
+			// A credential that was found but refused keeps its id in the log.
+			$key_id = $key_id ?: $this->authenticator->get_last_key_id();
+
 			$this->audit($key_id, $log_action, $e->get_status_code(), $e->get_error_code());
 
 			return $this->responder->from_exception($e);
 		}
 		catch (\Throwable $e)
 		{
+			$key_id = $key_id ?: $this->authenticator->get_last_key_id();
+
 			$this->audit($key_id, $log_action, 500, 'internal_error');
 
 			return $this->responder->error('internal_error', 500);
