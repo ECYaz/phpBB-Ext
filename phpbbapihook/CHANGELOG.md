@@ -30,6 +30,7 @@ Other extensions can now offer their own endpoints through the API.
   GET or HEAD, so no endpoint (core or third party) can forget it.
 - A PHP error inside an endpoint is answered with `internal_error` (500) instead
   of an HTML error page.
+- The minimum PHP version is now 7.1.3, the same as phpBB 3.3 itself.
 
 ### Fixed
 - A request now carries the member flags of the linked user (`is_registered`),
